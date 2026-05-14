@@ -4,7 +4,23 @@ import { usePathname } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 import AuthScreen from '@/components/AuthScreen'
 import OfflineIndicator from '@/components/OfflineIndicator'
+import BottomNav from '@/components/BottomNav'
+import { NavProvider, useNav } from '@/contexts/NavContext'
 import type { ReactNode } from 'react'
+
+function ShellInner({ children }: { children: ReactNode }) {
+  const { onAddExpense } = useNav()
+
+  return (
+    <div className="h-screen flex flex-col overflow-hidden bg-brand-cream">
+      <OfflineIndicator />
+      <main className="flex-1 overflow-y-auto">
+        {children}
+      </main>
+      <BottomNav onAddExpense={onAddExpense ?? undefined} />
+    </div>
+  )
+}
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth()
@@ -20,17 +36,16 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   if (!user && pathname !== '/auth') {
     return (
-      <>
+      <div className="h-screen bg-brand-cream flex flex-col overflow-hidden">
         <OfflineIndicator />
         <AuthScreen />
-      </>
+      </div>
     )
   }
 
   return (
-    <>
-      <OfflineIndicator />
-      {children}
-    </>
+    <NavProvider>
+      <ShellInner>{children}</ShellInner>
+    </NavProvider>
   )
 }

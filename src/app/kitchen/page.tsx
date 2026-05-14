@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, X, Search, Edit3, Trash2, ChevronDown, ArrowLeft } from 'lucide-react'
-import BottomNav from '@/components/BottomNav'
 import BlindBox from '@/components/BlindBox'
 import ShoppingList from '@/components/ShoppingList'
 import FoodMemoryWall from '@/components/FoodMemoryWall'
@@ -124,8 +123,8 @@ export default function KitchenPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <div className="flex-1 overflow-y-auto px-5 pt-3 pb-2">
+    <Fragment>
+      <div className="px-5 pt-3 pb-2">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -290,8 +289,6 @@ export default function KitchenPage() {
         )}
       </div>
 
-      <BottomNav />
-
       <AnimatePresence>
         {showRecipeForm && (
           <>
@@ -402,6 +399,6 @@ export default function KitchenPage() {
           </>
         )}
       </AnimatePresence>
-    </div>
+    </Fragment>
   )
 }

@@ -78,6 +78,21 @@ export async function createPair(): Promise<{
   const myId = await getCurrentUserId()
   if (!myId) return null
 
+  const existingPairId = getStoredPairId()
+  if (existingPairId) {
+    const { data: existing } = await supabase()
+      .from('pairs')
+      .select('id, pair_code, members')
+      .eq('id', existingPairId)
+      .maybeSingle()
+
+    if (existing) {
+      const partnerId = (existing.members as string[]).find((id) => id !== myId) ?? null
+      if (partnerId) localStorage.setItem(PARTNER_KEY, partnerId)
+      return { pairId: existing.id, pairCode: existing.pair_code, partnerId }
+    }
+  }
+
   const code = Math.random().toString(36).substring(2, 8).toUpperCase()
   const { data } = await supabase()
     .from('pairs')

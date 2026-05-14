@@ -1,14 +1,14 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, TrendingUp } from 'lucide-react'
-import BottomNav from '@/components/BottomNav'
 import AddExpenseModal from '@/components/AddExpenseModal'
 import { getCategory, getGroup } from '@/data/categories'
 import { useExpenses } from '@/hooks/useExpenses'
 import { useBudget } from '@/hooks/useBudget'
 import { getStoredPairId } from '@/lib/pairing'
+import { useNav } from '@/contexts/NavContext'
 import type { Expense, ExpenseFormData } from '@/types'
 
 const weekdays = ['日', '一', '二', '三', '四', '五', '六']
@@ -55,6 +55,7 @@ export default function BudgetPage() {
   const pairId = getStoredPairId()
   const { expenses, addExpense, updateExpense, myId } = useExpenses(pairId)
   const { total: budgetTotal } = useBudget(pairId)
+  const { setOnAddExpense } = useNav()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editExpense, setEditExpense] = useState<Expense | null>(null)
@@ -63,6 +64,17 @@ export default function BudgetPage() {
 
   const currentMonth = currentMonthStr()
   const today = todayString()
+
+  const handleAddNew = () => {
+    setEditExpense(null)
+    setModalKey((k) => k + 1)
+    setIsModalOpen(true)
+  }
+
+  useEffect(() => {
+    setOnAddExpense(handleAddNew)
+    return () => setOnAddExpense(null)
+  }, [setOnAddExpense])
 
   const monthExpenses = useMemo(
     () => expenses.filter((e) => e.date.startsWith(currentMonth)),
@@ -96,20 +108,14 @@ export default function BudgetPage() {
     setIsModalOpen(true)
   }
 
-  const handleAddNew = () => {
-    setEditExpense(null)
-    setModalKey((k) => k + 1)
-    setIsModalOpen(true)
-  }
-
   const handleCloseModal = () => {
     setEditExpense(null)
     setIsModalOpen(false)
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <div className="flex-1 overflow-y-auto px-5 pt-3 pb-2">
+    <div className="min-h-0">
+      <div className="px-5 pt-3 pb-2">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -321,9 +327,7 @@ export default function BudgetPage() {
           </div>
         </div>
       </div>
-
-      <BottomNav onAddExpense={handleAddNew} />
-
+      
       <AddExpenseModal
         key={editExpense?.id || `new-${modalKey}`}
         isOpen={isModalOpen}

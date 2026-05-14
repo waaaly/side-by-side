@@ -1,9 +1,9 @@
 'use client'
 
+import { Fragment } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import BottomNav from '@/components/BottomNav'
 
 const settingsItems = [
   { icon: '💞', label: '配对管理', desc: '邀请伴侣、查看配对状态', href: '/settings/pairing' },
@@ -15,8 +15,8 @@ const settingsItems = [
 
 export default function SettingsPage() {
   return (
-    <div className="h-screen flex flex-col">
-      <div className="flex-1 overflow-y-auto px-5 pt-3 pb-2">
+    <Fragment>
+      <div className="px-5 pt-3 pb-2">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -50,7 +50,6 @@ export default function SettingsPage() {
           ))}
         </div>
       </div>
-      <BottomNav />
-    </div>
+    </Fragment>
   )
 }

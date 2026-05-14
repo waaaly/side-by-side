@@ -14,12 +14,14 @@ export default function PairingSettingsPage() {
   const [joinError, setJoinError] = useState<string | null>(null)
   const [joinSuccess, setJoinSuccess] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [justCreated, setJustCreated] = useState(false)
 
   useEffect(() => {
     const init = async () => {
       const info = await syncPairInfo()
       setPairCode(info.pairCode)
       setPartnerId(info.partnerId)
+      if (info.partnerId) setJustCreated(false)
       setLoading(false)
     }
     init()
@@ -31,6 +33,7 @@ export default function PairingSettingsPage() {
     if (result) {
       setPairCode(result.pairCode)
       setPartnerId(result.partnerId)
+      if (!result.partnerId) setJustCreated(true)
     }
     setLoading(false)
   }
@@ -45,6 +48,7 @@ export default function PairingSettingsPage() {
       setPairCode(result.pairCode)
       setPartnerId(result.partnerId)
       setJoinSuccess(true)
+      setJustCreated(false)
     } else {
       setJoinError('邀请码无效或已过期')
     }
@@ -129,6 +133,29 @@ export default function PairingSettingsPage() {
                 生成邀请码
               </button>
             </motion.div>
+
+            {/* ─── 刚生成的邀请码 ─── */}
+            {justCreated && pairCode && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-3xl p-6 shadow-sm text-center"
+              >
+                <p className="text-xs text-gray-400 mb-3">分享此邀请码给你的伴侣</p>
+                <div className="flex items-center gap-2 mb-4">
+                  <code className="flex-1 text-center text-lg font-bold tracking-widest text-brand-pink bg-brand-pink/5 rounded-xl py-3">
+                    {pairCode}
+                  </code>
+                  <button
+                    onClick={handleCopy}
+                    className="w-11 h-11 flex items-center justify-center bg-gray-50 rounded-xl active:scale-90 transition"
+                  >
+                    {copied ? <Check size={18} className="text-brand-sage" /> : <Copy size={18} className="text-gray-400" />}
+                  </button>
+                </div>
+                <p className="text-[10px] text-gray-300">等待对方输入此邀请码加入…</p>
+              </motion.div>
+            )}
 
             {/* 加入配对 */}
             <motion.div
