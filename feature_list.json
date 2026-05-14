@@ -3,15 +3,15 @@
   "meta": {
     "description": "SideBySide 开发进度记录文件。每次开发前读取此文件了解当前进度，开发完成后更新任务状态。",
     "version": "1.0",
-    "lastUpdated": "2026-05-14T18:30:00+08:00"
+    "lastUpdated": "2026-05-14T19:00:00+08:00"
   },
   "project": {
     "name": "SideBySide (SBS)",
-    "phase": "budget-mvp",
-    "overallProgress": 24,
+    "phase": "kitchen-mvp",
+    "overallProgress": 33,
     "startDate": "2026-05-14",
     "targetDate": "2026-07-09",
-    "currentSprint": "Phase 2: 账单 MVP"
+    "currentSprint": "Phase 3: 食谱 MVP"
   },
   "modules": [
     {
@@ -37,15 +37,15 @@
       "id": "module-kitchen",
       "name": "🍳 食谱模块",
       "route": "/kitchen",
-      "status": "pending",
-      "progress": 0,
+      "status": "completed",
+      "progress": 100,
       "features": [
-        { "id": "kitchen-001", "name": "食谱库 CRUD（名称/emoji/食材/标签）", "priority": "P0", "status": "pending", "usRef": "US-7", "frRef": "FR-10", "notes": "搜索 + 标签筛选" },
-        { "id": "kitchen-002", "name": "盲盒抽菜（随机 + spring 动画）", "priority": "P0", "status": "pending", "usRef": "US-8", "frRef": "FR-12,FR-13", "notes": "0.8s shuffle → emoji闪烁 → 菜名渐入" },
-        { "id": "kitchen-003", "name": "盲盒空状态", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "空食谱库时显示引导插画" },
-        { "id": "kitchen-004", "name": "买菜清单（双人实时同步）", "priority": "P0", "status": "pending", "usRef": "US-10", "frRef": "FR-15", "notes": "添加/勾选划线动画/删除" },
-        { "id": "kitchen-005", "name": "食材快捷加入清单", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "FR-14", "notes": "盲盒食材旁 + 按钮" },
-        { "id": "kitchen-006", "name": "美食记忆墙（文字版）", "priority": "P0", "status": "pending", "usRef": "US-9", "frRef": "FR-16,FR-17", "notes": "时间线：日期 + 菜名 + emoji" },
+        { "id": "kitchen-001", "name": "食谱库 CRUD（名称/emoji/食材/标签）", "priority": "P0", "status": "completed", "usRef": "US-7", "frRef": "FR-10", "notes": "底部抽屉表单 CRUD + 搜索 + 标签筛选" },
+        { "id": "kitchen-002", "name": "盲盒抽菜（随机 + spring 动画）", "priority": "P0", "status": "completed", "usRef": "US-8", "frRef": "FR-12,FR-13", "notes": "0.8s shuffle → emoji闪烁 → 菜名渐入，换一道" },
+        { "id": "kitchen-003", "name": "盲盒空状态", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "空食谱库显示引导文案" },
+        { "id": "kitchen-004", "name": "买菜清单（双人实时同步）", "priority": "P0", "status": "completed", "usRef": "US-10", "frRef": "FR-15", "notes": "ShoppingList 组件：添加/勾选划线/删除" },
+        { "id": "kitchen-005", "name": "食材快捷加入清单", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-14", "notes": "盲盒食材旁 + 按钮，去重检查" },
+        { "id": "kitchen-006", "name": "美食记忆墙（文字版）", "priority": "P0", "status": "completed", "usRef": "US-9", "frRef": "FR-16,FR-17", "notes": "FoodMemoryWall 组件：时间线 + 记录入口" },
         { "id": "kitchen-007", "name": "美食拍照上传", "priority": "P1", "status": "pending", "usRef": "US-9", "frRef": "FR-18", "notes": "相机/相册 → 记忆墙配图" },
         { "id": "kitchen-008", "name": "AI 标签推荐食谱", "priority": "P1", "status": "pending", "usRef": "US-14", "frRef": "FR-19", "notes": "经期→暖宫，季节→时令" },
         { "id": "kitchen-009", "name": "AI 时令食材推荐", "priority": "P2", "status": "pending", "usRef": "US-16", "frRef": "FR-20", "notes": "月份→时令食材 → 匹配菜谱" },
@@ -166,13 +166,13 @@
   ],
   "summary": {
     "totalFeatures": 75,
-    "completed": 18,
+    "completed": 24,
     "inProgress": 0,
-    "pending": 57,
+    "pending": 51,
     "statusBreakdown": {
-      "completed": ["global-001", "global-002", "global-003", "global-004", "global-005", "global-006", "global-007", "nav-001", "nav-002", "nav-003", "nav-004", "budget-001", "budget-002", "budget-003", "budget-004", "budget-005", "budget-006", "budget-007"],
+      "completed": ["global-001", "global-002", "global-003", "global-004", "global-005", "global-006", "global-007", "nav-001", "nav-002", "nav-003", "nav-004", "budget-001", "budget-002", "budget-003", "budget-004", "budget-005", "budget-006", "budget-007", "kitchen-001", "kitchen-002", "kitchen-003", "kitchen-004", "kitchen-005", "kitchen-006"],
       "inProgress": [],
-      "pending": "remaining 57 features"
+      "pending": "remaining 51 features"
     }
   },
   "agentInstructions": {

@@ -36,6 +36,15 @@ export interface ShoppingItem {
   note?: string
 }
 
+export interface FoodMemory {
+  id: string
+  recipeId?: string
+  recipeName: string
+  emoji: string
+  date: string
+  note?: string
+}
+
 export interface ExpenseFormData {
   amount: number
   category: ExpenseCategory
