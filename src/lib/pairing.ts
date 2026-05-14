@@ -13,14 +13,22 @@ export function getStoredPairId(): string | null {
   return localStorage.getItem(STORAGE_KEY)
 }
 
-export function getStoredMemberId(): string {
+export async function getMemberId(): Promise<string> {
   if (typeof window === 'undefined') return 'local-dev'
+  const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (session?.user?.id) return session.user.id
   let id = localStorage.getItem(MEMBER_KEY)
   if (!id) {
-    id = `user_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
+    id = `anon_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
     localStorage.setItem(MEMBER_KEY, id)
   }
   return id
+}
+
+export function getStoredMemberId(): string {
+  if (typeof window === 'undefined') return 'local-dev'
+  return localStorage.getItem(MEMBER_KEY) ?? 'local-dev'
 }
 
 export function getStoredPairCode(): string | null {
@@ -33,7 +41,7 @@ export async function createOrJoinPair(): Promise<{
   pairCode: string
   isNew: boolean
 }> {
-  const memberId = getStoredMemberId()
+  const memberId = await getMemberId()
   const existing = getStoredPairId()
 
   if (existing) {
@@ -44,7 +52,7 @@ export async function createOrJoinPair(): Promise<{
     .from('pairs')
     .select('id, pair_code')
     .contains('members', [memberId])
-    .single()
+    .maybeSingle()
 
   if (existingPair) {
     localStorage.setItem(STORAGE_KEY, existingPair.id)
@@ -69,12 +77,12 @@ export async function createOrJoinPair(): Promise<{
 }
 
 export async function tryJoinPair(code: string): Promise<boolean> {
-  const memberId = getStoredMemberId()
+  const memberId = await getMemberId()
   const { data: pair } = await supabase()
     .from('pairs')
     .select('*')
     .eq('pair_code', code.toUpperCase())
-    .single()
+    .maybeSingle()
 
   if (!pair) return false
   if (pair.members.includes(memberId)) {

@@ -30,6 +30,10 @@ jobs:
         
       - name: Build with Next.js
         run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_INVITE_CODE: ${{ vars.NEXT_PUBLIC_INVITE_CODE }}
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

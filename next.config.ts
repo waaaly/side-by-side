@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['192.168.100.114','192.168.56.1'],
   // 1. 极其重要：开启静态导出模式，编译后会生成纯 HTML/CSS/JS 文件
   output: 'export',
   
@@ -9,10 +10,8 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   
-  // 3. 注意（如果遇到样式路径失效再配置）：
-  // 如果你的 GitHub 仓库名字叫 "our-app"，那么编译后的访问路径是 username.github.io/our-app/
-  // 这时需要解除下方两行的注释，把 "/our-app" 改成你的真实仓库名
-  basePath: '/side-by-side',
+  // 3. GitHub Pages 部署时的路径（仅构建时生效，dev 模式下不启用）
+  basePath: process.env.NODE_ENV === 'production' ? '/side-by-side' : undefined,
 };
 
 export default nextConfig;
