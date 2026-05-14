@@ -5,15 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Trash2 } from 'lucide-react'
 import BottomNav from '@/components/BottomNav'
 import Calendar from '@/components/Calendar'
-import type { CalendarEvent } from '@/types'
-
-const mockEvents: CalendarEvent[] = [
-  { id: 'e1', type: 'period_start', title: '姨妈来了', date: '2026-05-10' },
-  { id: 'e2', type: 'period_end', title: '姨妈结束', date: '2026-05-14' },
-  { id: 'e3', type: 'anniversary', title: '在一起 1000 天', date: '2026-05-20', repeat: true },
-  { id: 'e4', type: 'birthday', title: '妈妈生日', date: '2026-05-18', repeat: true },
-  { id: 'e5', type: 'schedule', title: '周五约会电影', date: '2026-05-16', note: '晚7点 IMAX' },
-]
+import { useCalendarEvents } from '@/hooks/useCalendarEvents'
+import { getStoredPairId } from '@/lib/pairing'
 
 const EVENT_LABEL: Record<string, { icon: string; label: string }> = {
   period_start: { icon: '🩸', label: '生理期开始' },
@@ -28,7 +21,7 @@ function fmtDate(s: string) {
   return `${d.getMonth() + 1}月${d.getDate()}日`
 }
 
-function getActivePeriod(events: CalendarEvent[]): string | null {
+function getActivePeriod(events: { type: string; date: string }[]): string | null {
   const starts = events
     .filter((e) => e.type === 'period_start')
     .sort((a, b) => b.date.localeCompare(a.date))
@@ -40,8 +33,10 @@ function getActivePeriod(events: CalendarEvent[]): string | null {
 }
 
 export default function CalendarPage() {
+  const pairId = getStoredPairId()
+  const { events, addEvent, updateEvent, deleteEvent } = useCalendarEvents(pairId)
+
   const [currentMonth, setCurrentMonth] = useState(new Date())
-  const [events, setEvents] = useState(mockEvents)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [formType, setFormType] = useState<'anniversary' | 'birthday' | 'schedule'>('anniversary')
@@ -82,7 +77,7 @@ export default function CalendarPage() {
   const handlePeriodStart = () => {
     if (!selectedDate) return
     if (events.some((e) => e.type === 'period_start' && e.date === selectedDate)) return
-    setEvents((prev) => [...prev, { id: `ev${Date.now()}`, type: 'period_start', title: '姨妈来了', date: selectedDate }])
+    addEvent({ type: 'period_start', title: '姨妈来了', date: selectedDate })
     setSelectedDate(null)
   }
 
@@ -90,7 +85,7 @@ export default function CalendarPage() {
     if (!selectedDate || !activePeriodStart) return
     if (events.some((e) => e.type === 'period_end' && e.date === selectedDate)) return
     if (selectedDate < activePeriodStart) return
-    setEvents((prev) => [...prev, { id: `ev${Date.now()}`, type: 'period_end', title: '姨妈结束', date: selectedDate }])
+    addEvent({ type: 'period_end', title: '姨妈结束', date: selectedDate })
     setSelectedDate(null)
   }
 
@@ -104,17 +99,13 @@ export default function CalendarPage() {
 
   const handleSaveEvent = () => {
     if (!formTitle.trim() || !selectedDate) return
-    setEvents((prev) => [
-      ...prev,
-      {
-        id: `ev${Date.now()}`,
-        type: formType,
-        title: formTitle.trim(),
-        date: selectedDate,
-        repeat: formRepeat,
-        note: formNote.trim() || undefined,
-      },
-    ])
+    addEvent({
+      type: formType,
+      title: formTitle.trim(),
+      date: selectedDate,
+      repeat: formRepeat,
+      note: formNote.trim() || undefined,
+    })
     setShowForm(false)
     setSelectedDate(null)
   }
@@ -124,7 +115,7 @@ export default function CalendarPage() {
       setShowDeleteConfirm(id)
       return
     }
-    setEvents((prev) => prev.filter((e) => e.id !== id))
+    deleteEvent(id)
     setSelectedDate(null)
   }
 
@@ -132,28 +123,24 @@ export default function CalendarPage() {
     if (!showDeleteConfirm) return
     const target = events.find((e) => e.id === showDeleteConfirm)
     if (!target) return setShowDeleteConfirm(null)
-    if (target.repeat) {
-      const [, em, ed] = target.date.split('-')
-      setEvents((prev) =>
-        prev.filter((e) => {
-          if (e.id === target.id) return false
-          if (e.repeat && e.type === target.type) {
-            const [, em2, ed2] = e.date.split('-')
-            if (`${em2}-${ed2}` === `${em}-${ed}`) return false
-          }
-          return true
-        }),
-      )
-    } else {
-      setEvents((prev) => prev.filter((e) => e.id !== showDeleteConfirm))
-    }
+    const [, em, ed] = target.date.split('-')
+    events
+      .filter((e) => {
+        if (e.id === target.id) return true
+        if (e.repeat && e.type === target.type) {
+          const [, em2, ed2] = e.date.split('-')
+          return `${em2}-${ed2}` === `${em}-${ed}`
+        }
+        return false
+      })
+      .forEach((e) => deleteEvent(e.id))
     setShowDeleteConfirm(null)
     setSelectedDate(null)
   }
 
   const confirmDeleteOnce = () => {
     if (!showDeleteConfirm) return
-    setEvents((prev) => prev.filter((e) => e.id !== showDeleteConfirm))
+    deleteEvent(showDeleteConfirm)
     setShowDeleteConfirm(null)
     setSelectedDate(null)
   }
@@ -179,7 +166,6 @@ export default function CalendarPage() {
         />
       </div>
 
-      {/* Date Detail Bottom Sheet */}
       <AnimatePresence>
         {selectedDate && (
           <>
@@ -207,7 +193,6 @@ export default function CalendarPage() {
               </div>
 
               <div className="flex-1 overflow-y-auto px-6 py-4">
-                {/* Events on this day */}
                 {selectedEvents.length > 0 && (
                   <div className="mb-5 space-y-2">
                     <p className="text-xs text-gray-400 mb-2">🗓️ 当天事件</p>
@@ -238,10 +223,8 @@ export default function CalendarPage() {
                   </div>
                 )}
 
-                {/* Actions */}
                 <p className="text-xs text-gray-400 mb-3">📌 添加事件</p>
                 <div className="flex flex-wrap gap-2">
-                  {/* Period Start */}
                   {!events.some((e) => e.type === 'period_start' && e.date === selectedDate) &&
                     selectedDate !== activePeriodStart && (
                     <button
@@ -251,7 +234,6 @@ export default function CalendarPage() {
                       <span>🩸</span> 姨妈来了
                     </button>
                   )}
-                  {/* Period End */}
                   {activePeriodStart && selectedDate >= activePeriodStart &&
                     !events.some((e) => e.type === 'period_end' && e.date === selectedDate) && (
                     <button
@@ -286,7 +268,6 @@ export default function CalendarPage() {
         )}
       </AnimatePresence>
 
-      {/* Event Form Bottom Sheet */}
       <AnimatePresence>
         {showForm && (
           <>
@@ -378,7 +359,6 @@ export default function CalendarPage() {
         )}
       </AnimatePresence>
 
-      {/* Delete confirmation modal */}
       <AnimatePresence>
         {showDeleteConfirm && (
           <>

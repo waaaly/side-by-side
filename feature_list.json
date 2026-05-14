@@ -7,11 +7,11 @@
   },
   "project": {
     "name": "SideBySide (SBS)",
-    "phase": "settings-mvp",
-    "overallProgress": 53,
+    "phase": "data-layer",
+    "overallProgress": 60,
     "startDate": "2026-05-14",
     "targetDate": "2026-07-09",
-    "currentSprint": "Phase 5: 设置 MVP"
+    "currentSprint": "Phase 6: Supabase & 数据层"
   },
   "modules": [
     {
@@ -111,7 +111,7 @@
         { "id": "ai-003", "name": "月度财务分析报告", "priority": "P1", "status": "pending", "usRef": "US-6", "frRef": "FR-31", "notes": "Prompt 2：双层分析+环比+异常+3条建议" },
         { "id": "ai-004", "name": "AI 食谱推荐（经期/季节）", "priority": "P1", "status": "pending", "usRef": "US-14", "frRef": "FR-32", "notes": "从食谱库匹配推荐" },
         { "id": "ai-005", "name": "AI 提醒建议（纪念日/生理期）", "priority": "P1", "status": "pending", "usRef": "US-14,US-15", "frRef": "FR-33", "notes": "日历事件 T-1 生成行动建议" },
-        { "id": "ai-006", "name": "AI 缓存策略（Firestore 缓存）", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "FR-34", "notes": "避免每次打开调用 API" },
+        { "id": "ai-006", "name": "AI 缓存策略（Supabase 缓存）", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "FR-34", "notes": "避免每次打开调用 API" },
         { "id": "ai-007", "name": "AI 卡片 UI（流式打字 + 关闭/反馈）", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "—", "notes": "👍/👎 反馈，右上角 X 关闭" },
         { "id": "ai-008", "name": "AI 异常降级（API 失败回退）", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "—", "notes": "失败→缓存上次报告→不阻塞页面" }
       ]
@@ -121,15 +121,15 @@
       "name": "📦 数据层",
       "route": "cross-module",
       "status": "pending",
-      "progress": 0,
+      "progress": 100,
       "features": [
-        { "id": "data-001", "name": "Firebase 项目配置 + SDK 集成", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "创建项目、安装SDK、配置索引" },
-        { "id": "data-002", "name": "Firestore 数据模型实现", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "pairs/expenses/recipes/shoppingList/foodMemories/calendarEvents/aiReports" },
-        { "id": "data-003", "name": "双人配对机制（邀请码）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "pairId 关联两用户" },
-        { "id": "data-004", "name": "自定义 Hooks（useExpenses 等）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "各模块数据操作 hooks" },
-        { "id": "data-005", "name": "Firestore 实时同步（onSnapshot）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "双人实时数据同步" },
-        { "id": "data-006", "name": "离线持久化 + 冲突处理", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "离线可用，最后写入胜出" },
-        { "id": "data-007", "name": "Firestore Security Rules", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "仅 pair 成员可读写" }
+        { "id": "data-001", "name": "Supabase 项目配置 + SDK 集成", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "已安装 @supabase/supabase-js + @supabase/ssr，配置 .env.local" },
+        { "id": "data-002", "name": "Supabase 数据模型实现", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "src/lib/db.ts — 7 张表 CRUD + src/types/database.ts 类型定义" },
+        { "id": "data-003", "name": "双人配对机制（邀请码）", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "src/lib/pairing.ts — createOrJoinPair / tryJoinPair + localStorage 持久化" },
+        { "id": "data-004", "name": "自定义 Hooks（useExpenses 等）", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "6 个 hooks：useExpenses/useRecipes/useShoppingList/useFoodMemories/useCalendarEvents/useBudget" },
+        { "id": "data-005", "name": "Supabase 实时同步（Realtime）", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "各 hooks 内置 postgres_changes 订阅，实时同步" },
+        { "id": "data-006", "name": "离线持久化 + 冲突处理", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "OfflineIndicator 组件 + 乐观更新模式" },
+        { "id": "data-007", "name": "Supabase RLS Policies", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "migration 00001 包含完整 RLS 策略：仅 pair 成员可读写" }
       ]
     },
     {
@@ -166,13 +166,13 @@
   ],
   "summary": {
     "totalFeatures": 75,
-    "completed": 38,
+    "completed": 45,
     "inProgress": 0,
-    "pending": 37,
+    "pending": 30,
     "statusBreakdown": {
-      "completed": ["global-001", "global-002", "global-003", "global-004", "global-005", "global-006", "global-007", "nav-001", "nav-002", "nav-003", "nav-004", "budget-001", "budget-002", "budget-003", "budget-004", "budget-005", "budget-006", "budget-007", "kitchen-001", "kitchen-002", "kitchen-003", "kitchen-004", "kitchen-005", "kitchen-006", "cal-001", "cal-002", "cal-003", "cal-004", "cal-005", "cal-006", "cal-007", "cal-008", "cal-009", "settings-001", "settings-002", "settings-003", "settings-004", "settings-005"],
+      "completed": ["global-001", "global-002", "global-003", "global-004", "global-005", "global-006", "global-007", "nav-001", "nav-002", "nav-003", "nav-004", "budget-001", "budget-002", "budget-003", "budget-004", "budget-005", "budget-006", "budget-007", "kitchen-001", "kitchen-002", "kitchen-003", "kitchen-004", "kitchen-005", "kitchen-006", "cal-001", "cal-002", "cal-003", "cal-004", "cal-005", "cal-006", "cal-007", "cal-008", "cal-009", "settings-001", "settings-002", "settings-003", "settings-004", "settings-005", "data-001", "data-002", "data-003", "data-004", "data-005", "data-006", "data-007"],
       "inProgress": [],
-      "pending": "remaining 37 features"
+      "pending": "remaining 30 features"
     }
   },
   "agentInstructions": {

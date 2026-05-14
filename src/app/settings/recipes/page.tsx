@@ -4,21 +4,13 @@ import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Search, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import type { Recipe } from '@/types'
-
-const mockRecipes: Recipe[] = [
-  { id: '1', name: '番茄炒蛋', emoji: '🍅', ingredients: ['番茄', '鸡蛋', '葱花'], tags: ['快手菜', '家常'] },
-  { id: '2', name: '可乐鸡翅', emoji: '🍗', ingredients: ['鸡翅', '可乐', '姜片'], tags: ['荤菜'] },
-  { id: '3', name: '麻婆豆腐', emoji: '🫘', ingredients: ['豆腐', '肉末', '豆瓣酱'], tags: ['辣', '下饭'] },
-  { id: '4', name: '蒜蓉西兰花', emoji: '🥦', ingredients: ['西兰花', '蒜末'], tags: ['快手菜', '素菜'] },
-  { id: '5', name: '红烧排骨', emoji: '🍖', ingredients: ['排骨', '酱油', '冰糖'], tags: ['荤菜', '下饭'] },
-  { id: '6', name: '奶油蘑菇汤', emoji: '🥣', ingredients: ['蘑菇', '奶油', '黄油'], tags: ['西餐', '汤'] },
-  { id: '7', name: '日式咖喱饭', emoji: '🍛', ingredients: ['咖喱块', '土豆', '胡萝卜', '鸡肉'], tags: ['下饭'] },
-  { id: '8', name: '葱油拌面', emoji: '🍜', ingredients: ['面条', '小葱', '酱油'], tags: ['快手菜'] },
-]
+import { useRecipes } from '@/hooks/useRecipes'
+import { getStoredPairId } from '@/lib/pairing'
 
 export default function RecipesSettingsPage() {
-  const [recipes, setRecipes] = useState(mockRecipes)
+  const pairId = getStoredPairId()
+  const { recipes, deleteRecipe } = useRecipes(pairId)
+
   const [search, setSearch] = useState('')
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
 
@@ -39,7 +31,7 @@ export default function RecipesSettingsPage() {
   }, [recipes, search, selectedTag])
 
   const handleDelete = (id: string) => {
-    setRecipes((prev) => prev.filter((r) => r.id !== id))
+    deleteRecipe(id)
   }
 
   return (

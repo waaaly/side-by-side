@@ -7,32 +7,11 @@ import BottomNav from '@/components/BottomNav'
 import BlindBox from '@/components/BlindBox'
 import ShoppingList from '@/components/ShoppingList'
 import FoodMemoryWall from '@/components/FoodMemoryWall'
-import type { Recipe, ShoppingItem, FoodMemory } from '@/types'
-
-const mockRecipes: Recipe[] = [
-  { id: '1', name: '番茄炒蛋', emoji: '🍅', ingredients: ['番茄', '鸡蛋', '葱花'], tags: ['快手菜', '家常'] },
-  { id: '2', name: '可乐鸡翅', emoji: '🍗', ingredients: ['鸡翅', '可乐', '姜片'], tags: ['荤菜'] },
-  { id: '3', name: '麻婆豆腐', emoji: '🫘', ingredients: ['豆腐', '肉末', '豆瓣酱'], tags: ['辣', '下饭'] },
-  { id: '4', name: '蒜蓉西兰花', emoji: '🥦', ingredients: ['西兰花', '蒜末'], tags: ['快手菜', '素菜'] },
-  { id: '5', name: '红烧排骨', emoji: '🍖', ingredients: ['排骨', '酱油', '冰糖'], tags: ['荤菜', '下饭'] },
-  { id: '6', name: '奶油蘑菇汤', emoji: '🥣', ingredients: ['蘑菇', '奶油', '黄油'], tags: ['西餐', '汤'] },
-  { id: '7', name: '日式咖喱饭', emoji: '🍛', ingredients: ['咖喱块', '土豆', '胡萝卜', '鸡肉'], tags: ['下饭'] },
-  { id: '8', name: '葱油拌面', emoji: '🍜', ingredients: ['面条', '小葱', '酱油'], tags: ['快手菜'] },
-]
-
-const mockShoppingList: ShoppingItem[] = [
-  { id: 's1', name: '鸡蛋', completed: false },
-  { id: 's2', name: '牛奶', completed: false, note: '要全脂的' },
-  { id: 's3', name: '番茄', completed: false },
-  { id: 's4', name: '面包', completed: true },
-  { id: 's5', name: '鸡翅', completed: false },
-]
-
-const mockMemories: FoodMemory[] = [
-  { id: 'm1', recipeId: '1', recipeName: '番茄炒蛋', emoji: '🍅', date: '2026-05-13' },
-  { id: 'm2', recipeId: '5', recipeName: '红烧排骨', emoji: '🍖', date: '2026-05-10' },
-  { id: 'm3', recipeId: '8', recipeName: '葱油拌面', emoji: '🍜', date: '2026-05-08' },
-]
+import { useRecipes } from '@/hooks/useRecipes'
+import { useShoppingList } from '@/hooks/useShoppingList'
+import { useFoodMemories } from '@/hooks/useFoodMemories'
+import { getStoredPairId } from '@/lib/pairing'
+import type { Recipe } from '@/types'
 
 function todayString(): string {
   const d = new Date()
@@ -40,10 +19,12 @@ function todayString(): string {
 }
 
 export default function KitchenPage() {
+  const pairId = getStoredPairId()
+  const { recipes, addRecipe, updateRecipe, deleteRecipe } = useRecipes(pairId)
+  const { items: shoppingItems, addItem, toggleItem, deleteItem } = useShoppingList(pairId)
+  const { memories, addMemory, deleteMemory } = useFoodMemories(pairId)
+
   const [viewMode, setViewMode] = useState<'home' | 'memories'>('home')
-  const [recipes, setRecipes] = useState(mockRecipes)
-  const [shoppingItems, setShoppingItems] = useState(mockShoppingList)
-  const [memories, setMemories] = useState(mockMemories)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
 
@@ -75,32 +56,25 @@ export default function KitchenPage() {
 
   const handleAddIngredient = (name: string) => {
     if (shoppingItems.some((i) => i.name === name)) return
-    setShoppingItems((prev) => [
-      ...prev,
-      { id: `s${Date.now()}`, name, completed: false },
-    ])
+    addItem(name)
   }
 
   const handleRecordMemory = (recipe: Recipe) => {
     if (memories.some((m) => m.recipeId === recipe.id && m.date === todayString())) return
-    setMemories((prev) => [
-      { id: `m${Date.now()}`, recipeId: recipe.id, recipeName: recipe.name, emoji: recipe.emoji, date: todayString() },
-      ...prev,
-    ])
+    addMemory({ recipeName: recipe.name, emoji: recipe.emoji, date: todayString() })
   }
 
   const handleToggleShopping = (id: string) => {
-    setShoppingItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, completed: !item.completed } : item)),
-    )
+    const item = shoppingItems.find((i) => i.id === id)
+    if (item) toggleItem(id, !item.completed)
   }
 
   const handleAddShopping = (name: string) => {
-    setShoppingItems((prev) => [...prev, { id: `s${Date.now()}`, name, completed: false }])
+    addItem(name)
   }
 
   const handleDeleteShopping = (id: string) => {
-    setShoppingItems((prev) => prev.filter((item) => item.id !== id))
+    deleteItem(id)
   }
 
   const openAddForm = () => {
@@ -126,24 +100,15 @@ export default function KitchenPage() {
     const ingredients = formIngredients.filter((i) => i.trim())
     const tags = formTags.split(/[、,，\s]+/).filter(Boolean)
     if (editingRecipe) {
-      setRecipes((prev) =>
-        prev.map((r) =>
-          r.id === editingRecipe.id
-            ? { ...r, name: formName.trim(), emoji: formEmoji.trim(), ingredients, tags }
-            : r,
-        ),
-      )
+      updateRecipe(editingRecipe.id, { name: formName.trim(), emoji: formEmoji.trim(), ingredients, tags })
     } else {
-      setRecipes((prev) => [
-        { id: `r${Date.now()}`, name: formName.trim(), emoji: formEmoji.trim(), ingredients, tags },
-        ...prev,
-      ])
+      addRecipe({ name: formName.trim(), emoji: formEmoji.trim(), ingredients, tags })
     }
     setShowRecipeForm(false)
   }
 
   const handleDeleteRecipe = (id: string) => {
-    setRecipes((prev) => prev.filter((r) => r.id !== id))
+    deleteRecipe(id)
   }
 
   const updateIngredient = (idx: number, val: string) => {
@@ -161,7 +126,6 @@ export default function KitchenPage() {
   return (
     <div className="h-screen flex flex-col">
       <div className="flex-1 overflow-y-auto px-5 pt-3 pb-2">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -213,7 +177,6 @@ export default function KitchenPage() {
               onDelete={handleDeleteShopping}
             />
 
-            {/* Recipe Library */}
             <div className="mb-20">
               <button
                 onClick={() => setShowLibrary(!showLibrary)}
@@ -238,7 +201,6 @@ export default function KitchenPage() {
                     exit={{ opacity: 0, height: 0 }}
                     className="overflow-hidden"
                   >
-                    {/* Search */}
                     <div className="relative mb-3">
                       <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" />
                       <input
@@ -250,7 +212,6 @@ export default function KitchenPage() {
                       />
                     </div>
 
-                    {/* Tag filters */}
                     {allTags.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mb-3">
                         <button
@@ -279,7 +240,6 @@ export default function KitchenPage() {
                       </div>
                     )}
 
-                    {/* Recipe list */}
                     <div className="space-y-1.5">
                       {filteredRecipes.map((recipe) => (
                         <div
@@ -332,7 +292,6 @@ export default function KitchenPage() {
 
       <BottomNav />
 
-      {/* Recipe Form Modal */}
       <AnimatePresence>
         {showRecipeForm && (
           <>

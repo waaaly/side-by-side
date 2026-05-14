@@ -14,7 +14,7 @@
 | 设置页 | ❌ 不存在 | 分类/食谱/预算/日历事件管理 |
 | 导航 | 3 Tab（📋/🍳/❤️） | 5 Tab（📋/🍳/➕/📅/⚙️） |
 | 记账弹窗 | 单页 Modal | 两段式 Bottom Sheet（分类→金额） |
-| 数据层 | Mock State | Firebase Firestore + 实时同步 + 离线 |
+| 数据层 | Mock State | Supabase (PostgreSQL + Realtime + 本地缓存) |
 | AI | ❌ 不存在 | LLM API、财务分析、食谱推荐、提醒建议 |
 | 测试 | ❌ 不存在 | Unit/Integration/E2E |
 | 主题/动效 | Tailwind v4 + Framer Motion | 统一审查 + prefers-reduced-motion |
@@ -28,7 +28,7 @@ Phase 1 (Foundation)
   ├── Phase 2 (账单 MVP) ──┐
   ├── Phase 3 (食谱 MVP) ──┤
   ├── Phase 4 (日历 MVP) ──┤
-  └── Phase 6 (Firebase) ──┤ ← 可与 Phase 2-4 并行
+  └── Phase 6 (Supabase) ──┤ ← 可与 Phase 2-4 并行
                             │
 Phase 5 (设置 MVP) ←───────┤
                             │
@@ -123,19 +123,19 @@ Phase 10 (测试上线) ←─────── 全部
 
 ---
 
-## Phase 6: Firebase & 数据层（Week 5-7）
+## Phase 6: Supabase & 数据层（Week 5-7）
 
 > 可与 Phase 2-4 并行进行，完成后逐步替换 Mock 数据。
 
 | # | 任务 | 详情 | 文件/组件 |
 |---|------|------|-----------|
-| 6.1 | Firebase 项目配置 | 创建 Firebase 项目，安装 `firebase` SDK，配置 Firestore 索引 | `src/lib/firebase.ts` (新建) |
-| 6.2 | Firestore 数据模型 | 实现 PRD Data Model 所有集合：pairs、expenses、recipes、shoppingList、foodMemories、calendarEvents、aiReports | `src/lib/firestore.ts` (新建) |
-| 6.3 | 双人配对 | 邀请码/链接配对，pairId 关联两位用户 | `src/lib/pairing.ts` (新建) |
-| 6.4 | 状态管理 hooks | 抽取自定义 hooks：`useExpenses`、`useRecipes`、`useShoppingList`、`useCalendarEvents`、`useBudget`、`useFoodMemories` | `src/hooks/` (新建目录) |
-| 6.5 | 实时同步 | Firestore `onSnapshot` 实现双人实时同步 | 各 hooks |
-| 6.6 | 离线支持 | Firestore `enableMultiTabIndexedDbPersistence`，乐观更新 + 冲突处理（最后写入胜出） | `src/lib/firebase.ts` |
-| 6.7 | 离线状态指示器 | 弱网时展示"离线"状态指示，联网自动恢复同步 | `src/components/OfflineIndicator.tsx` (新建) |
+| ~~6.1~~ | ~~Supabase 项目配置~~ | ✅ `@supabase/supabase-js` + `@supabase/ssr` 已安装，`.env.local` 已配置 | `src/lib/supabase.ts` |
+| ~~6.2~~ | ~~Supabase 数据模型~~ | ✅ 7 张表 CRUD 操作层 + Database 类型定义 | `src/lib/db.ts` + `src/types/database.ts` |
+| ~~6.3~~ | ~~双人配对~~ | ✅ 邀请码生成/加入 + localStorage 持久化 | `src/lib/pairing.ts` |
+| ~~6.4~~ | ~~状态管理 hooks~~ | ✅ 6 个自定义 hooks（useExpenses/useRecipes/useShoppingList/useFoodMemories/useCalendarEvents/useBudget） | `src/hooks/` |
+| ~~6.5~~ | ~~实时同步~~ | ✅ 各 hooks 内置 `postgres_changes` 订阅 | 各 hooks |
+| ~~6.6~~ | ~~离线支持~~ | ✅ OfflineIndicator 组件 + 乐观更新模式 | `src/components/OfflineIndicator.tsx` |
+| ~~6.7~~ | ~~离线状态指示器~~ | ✅ 离线/在线状态提示，联网自动恢复 | `src/components/OfflineIndicator.tsx` |
 
 **交付物：** 真实数据层 + 双人实时同步
 
@@ -146,11 +146,11 @@ Phase 10 (测试上线) ←─────── 全部
 | # | 任务 | 详情 | 文件/组件 |
 |---|------|------|-----------|
 | 7.1 | LLM API 集成 | 接入 OpenAI GPT-4o-mini / Claude 3 Haiku，创建 API route 或 client 调用层 | `src/lib/ai.ts` (新建) |
-| 7.2 | AI 智能归类 | 32 小分类归并为大分类（3-8 个），结果缓存到 Firestore aiReports | `src/lib/ai/classify.ts` (新建) |
+| 7.2 | AI 智能归类 | 32 小分类归并为大分类（3-8 个），结果缓存到 Supabase aiReports 表 | `src/lib/ai/classify.ts` (新建) |
 | 7.3 | 月度财务分析 | 每月 1 号自动触发（或用户主动），输出：一句话总结 + 大/小分类双层分析 + 环比 + 异常检测标红 + 3 条优化建议 | `src/lib/ai/monthly-analysis.ts` (新建) |
 | 7.4 | AI 食谱推荐 | 经期→暖宫食谱，当前月份→季节食谱，从已有食谱库推荐 | `src/lib/ai/recipe-recommend.ts` (新建) |
 | 7.5 | AI 提醒建议 | 日历事件 T-1 天生成行动建议文案（纪念日→礼物/餐厅，生理期→食谱） | `src/lib/ai/reminder.ts` (新建) |
-| 7.6 | AI 缓存策略 | AI 结果存 Firestore，每次打开先读缓存，过期/用户主动再刷新 | 7.3-7.5 |
+| 7.6 | AI 缓存策略 | AI 结果存 Supabase，每次打开先读缓存，过期/用户主动再刷新 | 7.3-7.5 |
 | 7.7 | AI 卡片 UI | 首页/日历/厨房页 AI 建议卡片，流式打字效果，右上角 X 关闭，👍/👎 反馈 | `src/components/AICard.tsx` (新建) |
 | 7.8 | AI API 异常降级 | 调用失败→显示"AI 暂不可用"+ 展示缓存的上次结果，不阻塞页面 | 7.7 |
 
@@ -178,12 +178,12 @@ Phase 10 (测试上线) ←─────── 全部
 | 9.1 | Framer Motion 动效统一 | 审查全部页面动效一致性：页面切换 `AnimatePresence`，列表 `layout` 动画，按钮缩放 | 全局 |
 | 9.2 | 触感反馈审查 | 确保所有可点击元素 `active:scale-95 transition` | 全局 |
 | 9.3 | iOS 真机测试 | safe-area 适配、状态栏颜色、全屏表现、禁止全局滚动 | 全局 |
-| 9.4 | Firestore Security Rules | 编写规则：仅 pair 成员可读写，expense 只能追加不能删除 | Phase 6 |
+| 9.4 | Supabase RLS Policies | 编写规则：仅 pair 成员可读写，expense 只能追加不能删除 | Phase 6 |
 | 9.5 | 分模块加载 | 动态导入 `next/dynamic` + `React.lazy`，首屏 JS <1MB | 全局 |
 | 9.6 | PWA 更新策略 | `serviceWorker.update()` 检测新版本，弹窗提示更新 | `src/app/layout.tsx` |
 | 9.7 | 引导流程 | 首次使用：情侣昵称 → 预设示例账单 + 示例食谱 | 全局 |
 | 9.8 | Edge Cases 覆盖 | 对照 PRD Edge Cases 表逐一验证修复 | 全局 |
-| 9.9 | 双人同时编辑冲突 | Firestore 最后写入胜出 + 短暂提示"清单已更新" | Phase 6 |
+| 9.9 | 双人同时编辑冲突 | Supabase 最后写入胜出 + 短暂提示"清单已更新" | Phase 6 |
 
 ---
 
@@ -206,7 +206,7 @@ Phase 10 (测试上线) ←─────── 全部
 | **M1: App 壳子** | Week 1 末 | 5-Tab 导航、路由全通 | 所有 Tab 可切换、➕ 凸出弹出记账、safe-area 正常 |
 | **M2: 账单 MVP** | Week 3 末 | 完整记账流程 | 32 分类选择→金额→保存→预算更新→流水列表→编辑→统计页 |
 | **M3: 食谱 + 日历 MVP** | Week 5 末 | 厨房 + 日历完整可用 | 盲盒抽菜/清单/记忆墙 + 月视图/生理期/纪念日/生日标记 |
-| **M4: 设置 + 数据层** | Week 6 末 | 设置页 + Firebase 数据层 | 分类管理/食谱管理/预算设置 + 双人实时同步/离线 |
+| **M4: 设置 + 数据层** | Week 6 末 | 设置页 + Supabase 数据层 | 分类管理/食谱管理/预算设置 + 双人实时同步/离线 |
 | **M5: AI 接入** | Week 7 末 | AI 全功能可用 | 财务分析/食谱推荐/提醒建议/智能归类 |
 | **🏁 Beta Launch** | Week 8 末 | 全功能 Beta 版本 | 内测、E2E 通过、iOS 真机验证 |
 
@@ -218,8 +218,8 @@ Phase 10 (测试上线) ←─────── 全部
 |--------|------|------|
 | LLM API | GPT-4o-mini / Claude Haiku | 平衡成本与中文质量 |
 | 双人配对 | 邀请码 + 扫码 | 简单安全，无需邮箱 |
-| 离线策略 | Firestore 离线持久化 | 原生支持，无需额外工作 |
+| 离线策略 | 本地数据缓存 | IndexedDB + Service Worker 缓存策略 |
 | AI 生成时机 | 每月 1 号自动 + 用户主动触发 | 体验与成本兼顾 |
-| 照片存储 | Firebase Storage（压缩后上传） | 成本可控，不走 Firestore base64 |
+| 照片存储 | Supabase Storage（压缩后上传） | 成本可控，不走数据库 base64 |
 | PWA 更新 | 检测到新版 → Toast "更新可用" → 手动刷新 | 不打断用户 |
 | 测试工具 | Vitest + Testing Library + Playwright | 生态成熟，配置轻量 |

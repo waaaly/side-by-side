@@ -5,23 +5,12 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { getCategory, getGroup } from '@/data/categories'
+import { useExpenses } from '@/hooks/useExpenses'
+import { getStoredPairId } from '@/lib/pairing'
 import type { Expense } from '@/types'
 
 type PersonFilter = 'all' | 'me' | 'partner'
 type PeriodFilter = 'week' | 'month' | 'quarter' | 'year'
-
-const mockExpenses: Expense[] = [
-  { id: '1', amount: 45, category: 'dining', description: '午餐·牛肉面', date: '2026-05-14' },
-  { id: '2', amount: 6, category: 'transit', description: '地铁往返', date: '2026-05-14' },
-  { id: '3', amount: 299, category: 'clothing', description: '情侣T恤', date: '2026-05-13' },
-  { id: '4', amount: 88, category: 'entertainment', description: '电影票×2', date: '2026-05-12' },
-  { id: '5', amount: 15, category: 'beverage', description: '奶茶', date: '2026-05-12' },
-  { id: '6', amount: 3500, category: 'rent', description: '本月房租', date: '2026-05-01' },
-  { id: '7', amount: 120, category: 'general', description: '超市采购', date: '2026-05-10' },
-  { id: '8', amount: 200, category: 'dining', description: '周末约会晚餐', date: '2026-05-09' },
-  { id: '9', amount: 32, category: 'snack', description: '薯片+可乐', date: '2026-05-08' },
-  { id: '10', amount: 80, category: 'transit', description: '打车回家', date: '2026-05-07' },
-]
 
 const personOptions: { value: PersonFilter; label: string }[] = [
   { value: 'all', label: '双方' },
@@ -37,14 +26,17 @@ const periodOptions: { value: PeriodFilter; label: string }[] = [
 ]
 
 export default function StatsPage() {
+  const pairId = getStoredPairId()
+  const { expenses } = useExpenses(pairId)
+
   const [person, setPerson] = useState<PersonFilter>('all')
   const [period, setPeriod] = useState<PeriodFilter>('month')
   const [showPersonDropdown, setShowPersonDropdown] = useState(false)
   const [showPeriodDropdown, setShowPeriodDropdown] = useState(false)
 
   const filteredExpenses = useMemo(() => {
-    return mockExpenses
-  }, [])
+    return expenses
+  }, [expenses])
 
   const totalSpent = useMemo(
     () => filteredExpenses.reduce((sum, e) => sum + e.amount, 0),
@@ -86,7 +78,6 @@ export default function StatsPage() {
   return (
     <div className="h-screen flex flex-col">
       <div className="flex-1 overflow-y-auto px-5 pt-3 pb-2">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -100,7 +91,6 @@ export default function StatsPage() {
           </div>
         </motion.div>
 
-        {/* Filters */}
         <div className="flex gap-2 mb-5">
           <div className="relative flex-1">
             <button
@@ -156,7 +146,6 @@ export default function StatsPage() {
           </div>
         </div>
 
-        {/* Total */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -169,7 +158,6 @@ export default function StatsPage() {
           </p>
         </motion.div>
 
-        {/* Group Breakdown */}
         <div className="bg-white rounded-3xl p-5 mb-4 shadow-sm">
           <h3 className="text-sm font-semibold text-brand-text mb-4">分类汇总</h3>
           <div className="space-y-3">
@@ -209,7 +197,6 @@ export default function StatsPage() {
           </div>
         </div>
 
-        {/* Category Ranking */}
         <div className="bg-white rounded-3xl p-5 shadow-sm mb-20">
           <h3 className="text-sm font-semibold text-brand-text mb-4">支出排行</h3>
           <div className="space-y-3">

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import OfflineIndicator from "@/components/OfflineIndicator";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +44,7 @@ export default function RootLayout({
   return (
     <html lang="zh" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="bg-brand-cream text-brand-text font-sans antialiased">
+        <OfflineIndicator />
         {children}
       </body>
     </html>

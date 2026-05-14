@@ -5,15 +5,24 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { CATEGORIES, CATEGORY_GROUPS } from '@/data/categories'
+import { useBudget } from '@/hooks/useBudget'
+import { getStoredPairId } from '@/lib/pairing'
 
 export default function BudgetSettingsPage() {
-  const [totalBudget, setTotalBudget] = useState('5000')
-  const [categoryBudgets, setCategoryBudgets] = useState<Record<string, string>>({})
+  const pairId = getStoredPairId()
+  const { total, categoryBudgets, updateBudget } = useBudget(pairId)
+
+  const [totalBudget, setTotalBudget] = useState(String(total))
+  const [catBudgets, setCatBudgets] = useState<Record<string, string>>(
+    () => Object.fromEntries(
+      Object.entries(categoryBudgets ?? {}).map(([k, v]) => [k, String(v)]),
+    ),
+  )
   const [showCategoryLimits, setShowCategoryLimits] = useState(false)
   const [saved, setSaved] = useState(false)
 
   const handleCategoryBudget = (value: string, val: string) => {
-    setCategoryBudgets((prev) => {
+    setCatBudgets((prev) => {
       const next = { ...prev }
       if (val === '' || Number(val) <= 0) {
         delete next[value]
@@ -25,6 +34,14 @@ export default function BudgetSettingsPage() {
   }
 
   const handleSave = () => {
+    const num = Number(totalBudget)
+    if (num <= 0) return
+    const cats: Record<string, number> = {}
+    for (const [k, v] of Object.entries(catBudgets)) {
+      const n = Number(v)
+      if (n > 0) cats[k] = n
+    }
+    updateBudget(num, Object.keys(cats).length > 0 ? cats : undefined)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
@@ -89,7 +106,7 @@ export default function BudgetSettingsPage() {
                             type="number"
                             inputMode="numeric"
                             placeholder="不限"
-                            value={categoryBudgets[cat.value] || ''}
+                            value={catBudgets[cat.value] || ''}
                             onChange={(e) => handleCategoryBudget(cat.value, e.target.value)}
                             min="0"
                             className="flex-1 text-xs text-brand-text outline-none bg-gray-50 rounded-lg px-3 py-1.5 placeholder:text-gray-300 tabular"

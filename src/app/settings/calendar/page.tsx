@@ -4,15 +4,8 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import type { CalendarEvent } from '@/types'
-
-const mockEvents: CalendarEvent[] = [
-  { id: 'e1', type: 'period_start', title: '姨妈来了', date: '2026-05-10' },
-  { id: 'e2', type: 'period_end', title: '姨妈结束', date: '2026-05-14' },
-  { id: 'e3', type: 'anniversary', title: '在一起 1000 天', date: '2026-05-20', repeat: true },
-  { id: 'e4', type: 'birthday', title: '妈妈生日', date: '2026-05-18', repeat: true },
-  { id: 'e5', type: 'schedule', title: '周五约会电影', date: '2026-05-16', note: '晚7点 IMAX' },
-]
+import { useCalendarEvents } from '@/hooks/useCalendarEvents'
+import { getStoredPairId } from '@/lib/pairing'
 
 const TYPE_META: Record<string, { icon: string; label: string }> = {
   period_start: { icon: '🩸', label: '生理期开始' },
@@ -28,7 +21,8 @@ function fmtDate(s: string) {
 }
 
 export default function CalendarEventsSettingsPage() {
-  const [events, setEvents] = useState(mockEvents)
+  const pairId = getStoredPairId()
+  const { events, deleteEvent } = useCalendarEvents(pairId)
   const [showConfirm, setShowConfirm] = useState<string | null>(null)
 
   const sorted = [...events].sort((a, b) => b.date.localeCompare(a.date))
@@ -37,7 +31,7 @@ export default function CalendarEventsSettingsPage() {
     if (repeat) {
       setShowConfirm(id)
     } else {
-      setEvents((prev) => prev.filter((e) => e.id !== id))
+      deleteEvent(id)
     }
   }
 
@@ -45,27 +39,23 @@ export default function CalendarEventsSettingsPage() {
     if (!showConfirm) return
     const target = events.find((e) => e.id === showConfirm)
     if (!target) return setShowConfirm(null)
-    if (target.repeat) {
-      const [, em, ed] = target.date.split('-')
-      setEvents((prev) =>
-        prev.filter((e) => {
-          if (e.id === target.id) return false
-          if (e.repeat && e.type === target.type) {
-            const [, em2, ed2] = e.date.split('-')
-            if (`${em2}-${ed2}` === `${em}-${ed}`) return false
-          }
-          return true
-        }),
-      )
-    } else {
-      setEvents((prev) => prev.filter((e) => e.id !== showConfirm))
-    }
+    const [, em, ed] = target.date.split('-')
+    events
+      .filter((e) => {
+        if (e.id === target.id) return true
+        if (e.repeat && e.type === target.type) {
+          const [, em2, ed2] = e.date.split('-')
+          return `${em2}-${ed2}` === `${em}-${ed}`
+        }
+        return false
+      })
+      .forEach((e) => deleteEvent(e.id))
     setShowConfirm(null)
   }
 
   const confirmDeleteOnce = () => {
     if (!showConfirm) return
-    setEvents((prev) => prev.filter((e) => e.id !== showConfirm))
+    deleteEvent(showConfirm)
     setShowConfirm(null)
   }
 
@@ -115,7 +105,6 @@ export default function CalendarEventsSettingsPage() {
         </div>
       </div>
 
-      {/* Delete confirmation */}
       <AnimatePresence>
         {showConfirm && (
           <>

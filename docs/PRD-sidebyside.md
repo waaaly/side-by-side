@@ -22,7 +22,7 @@ Three problems, one app.
 
 ### Solution Summary
 
-SideBySide 是一款基于 Next.js + Firebase 的 PWA 应用，通过底部五 Tab 导航整合四大页面模块 + 一个 AI Agent 层：
+SideBySide 是一款基于 Next.js + Supabase 的 PWA 应用，通过底部五 Tab 导航整合四大页面模块 + 一个 AI Agent 层：
 
 | 模块 | 路由 | 定位 | 解决什么问题 |
 |------|------|------|-------------|
@@ -167,7 +167,7 @@ SideBySide 是一款基于 Next.js + Firebase 的 PWA 应用，通过底部五 T
 - 推送通知（iOS PWA 无原生推送，v1.1 考虑 Service Worker + Web Push）
 - 多语言支持（仅中文）
 - AA 分摊计算功能
-- 照片云存储/CDN（v1.1 考虑 Firebase Storage）
+- 照片云存储/CDN（v1.1 考虑 Supabase Storage）
 - 与外部日历同步（Google/Apple Calendar）
 - AI Agent 的自定义训练/知识库植入
 
@@ -241,7 +241,7 @@ SideBySide 是一款基于 Next.js + Firebase 的 PWA 应用，通过底部五 T
 | FR-31 | 月度财务分析 prompt：输入当月各分类支出数据 → AI 输出可读分析报告 + 3 条省钱建议 | P1 |
 | FR-32 | AI 推荐食谱 prompt：输入当前季节/标签/用户偏好 → 从食谱库匹配并推荐 | P1 |
 | FR-33 | AI 提醒建议 prompt：输入日历事件类型 → 输出具体可执行的行动建议文案 | P1 |
-| FR-34 | AI 生成内容缓存在 Firestore 中，避免每次打开都调用 API | P1 |
+| FR-34 | AI 生成内容缓存在 Supabase 中，避免每次打开都调用 API | P1 |
 | FR-35 | 用户可对 AI 建议点 👍/👎 反馈，用于优化后续推荐 | P2 |
 
 #### Module 4: ⚙️ 设置模块
@@ -556,7 +556,7 @@ AI 建议均**可关闭**（右上角 X），用户可反馈 👍/👎。所有 
 | **AI API 调用失败/超时** | 回退显示"AI 分析暂不可用"，使用本地缓存的上次报告，不阻塞页面 |
 | **AI 生成内容不准确** | 用户可反馈 👍/👎，连续 👎 3 次该类型建议暂时降权 |
 | **美食照片上传失败** | 图片暂存本地，标记"上传中"，下次联网自动重试 |
-| **双人同时编辑同一份清单** | Firestore 实时同步，最后写入胜出，短暂显示"清单已更新"提示 |
+| **双人同时编辑同一份清单** | Supabase 实时同步，最后写入胜出，短暂显示"清单已更新"提示 |
 | **纪念日每年重复** | 系统自动在次年生成新事件，支持提前编辑/删除特定年份 |
 | **预算分类修改后历史数据** | 分类变更不影响历史数据，统计时仍按录入时分类计算 |
 | **对方删除日历事件** | 本端收到事件删除通知，事件从日历移除，弹窗提示"对方取消了 X 事件" |
@@ -582,9 +582,9 @@ AI 建议均**可关闭**（右上角 X），用户可反馈 👍/👎。所有 
 │  └────────┬─────────┘              │
 ├───────────┼──────────────────────────┤
 │           ▼                         │
-│  Firebase Firestore (实时数据库)     │
-│  Firebase Auth (v1.1)               │
-│  Firebase Storage (P1, 图片)        │
+│  Supabase (PostgreSQL + Realtime)    │
+│  Supabase Auth (v1.1)               │
+│  Supabase Storage (P1, 图片)        │
 └─────────────────────────────────────┘
 ```
 
@@ -592,7 +592,7 @@ AI 建议均**可关闭**（右上角 X），用户可反馈 👍/👎。所有 
 
 - **PWA 推送限制**：iOS PWA 不支持原生推送，日程提醒使用首页顶部提醒卡片（被动式），打开 App 即见
 - **AI API 成本**：每次分析约 500-1000 tokens，按每月 1 次财务分析 + 按需推荐估算，月度成本可控 (<$1/对/月)
-- **离线可用性**：核心操作（记账录入、清单勾选、日历查看）需支持离线，使用 Firestore 离线持久化 + IndexedDB 缓存
+- **离线可用性**：核心操作（记账录入、清单勾选、日历查看）需支持离线，使用本地数据缓存 + IndexedDB 缓存
 - **首屏加载**：PWA 必须控制在 1MB 以内，使用 Next.js 动态导入 + React.lazy 拆分各模块
 - **模型选择**：AI 推荐使用 `gpt-4o-mini` 或 `claude-3-haiku` 级别模型，平衡质量与成本
 
@@ -600,13 +600,13 @@ AI 建议均**可关闭**（右上角 X），用户可反馈 👍/👎。所有 
 
 | System | Integration | Purpose |
 |--------|------------|---------|
-| **Firebase Firestore** | Web SDK v10+ | 核心数据库，双人实时同步 |
-| **Firebase Auth** | Email Link / Anonymous | 用户认证 + 双人配对 |
-| **Firebase Storage (P1)** | Upload URL + download URL | 美食照片存储 |
+| **Supabase (PostgreSQL + Realtime)** | `@supabase/supabase-js` | 核心数据库，双人实时同步 |
+| **Supabase Auth** | Email Link / Anonymous | 用户认证 + 双人配对 |
+| **Supabase Storage (P1)** | Upload URL + download URL | 美食照片存储 |
 | **LLM API** | OpenAI / Anthropic REST API | AI 分析 + 推荐 + 提醒文案 |
 | **iOS Safari PWA** | manifest.json + meta tags | 添加到主屏幕全屏运行 |
 
-### Data Model (Firestore)
+### Data Model (Supabase/PostgreSQL)
 
 ```
 /pairs/{pairId}
@@ -731,7 +731,7 @@ AI 建议均**可关闭**（右上角 X），用户可反馈 👍/👎。所有 
 
 | Dependency | Owner | Status | Impact if Delayed |
 |------------|-------|--------|-------------------|
-| Firebase 项目创建 & Firestore 索引配置 | Dev | Pending | 所有数据持久化阻塞 |
+| Supabase 项目创建 & 数据库表配置 | Dev | Pending | 所有数据持久化阻塞 |
 | LLM API Key 申请 & 预算审批 | Product | Pending | AI 模块无可用 |
 | Next.js 16 PWA manifest + Service Worker 支持验证 | Dev | In Progress | 全屏/离线能力可能受限 |
 | iOS 18 Safari PWA 行为测试 | Dev | Pending | 需要真机验证 safe-area 和全屏表现 |
@@ -743,8 +743,8 @@ AI 建议均**可关闭**（右上角 X），用户可反馈 👍/👎。所有 
 |------|------------|--------|------------|
 | **iOS PWA 推送不可用** | H | M | 首版仅使用 App 内提醒卡片，不依赖推送；用户打开 App 即见 |
 | **AI API 成本随用户增长不可控** | M | H | 限制调用频次（财务分析每月 1 次），缓存结果，使用低成本模型 |
-| **Firestore 实时同步在弱网下体验差** | M | H | 使用乐观更新 + 本地缓存，弱网时展示离线状态指示器 |
-| **双人数据隐私争议** | L | M | 数据存储明文加密（Firestore 规则严格限制），v1.1 支持导出 |
+| **Supabase 实时同步在弱网下体验差** | M | H | 使用乐观更新 + 本地缓存，弱网时展示离线状态指示器 |
+| **双人数据隐私争议** | L | M | 数据存储明文加密（Supabase RLS 规则严格限制），v1.1 支持导出 |
 | **初次用户数据为空时体验差** | M | M | 首次使用提供引导流程 + 预设示例数据（示例账单、示例食谱） |
 | **LLM 生成内容质量不稳定** | M | M | 使用结构化 prompt + 后处理校验，提供用户反馈机制持续优化 |
 
@@ -758,7 +758,7 @@ AI 建议均**可关闭**（右上角 X），用户可反馈 👍/👎。所有 
 | **Phase 4: 日历 MVP** | 月视图日历、生理期标记、纪念日/生日/日程事件、日期详情面板 | 📅 日历页可完整使用 | Week 4-5 |
 | **Phase 5: 设置 MVP** | 分类管理（32 分类编辑/排序）、食谱管理、预算设置 | ⚙️ 设置页可完整使用 | Week 5-6 |
 | **Phase 6: AI 接入** | LLM API 接入、AI 智能归类、月度财务分析报告、经期食谱推荐、日程提醒建议 | 🤖 AI 层首次可用 | Week 6-7 |
-| **Phase 7: 润色 & 联调** | framer-motion 动效统一、触感反馈审查、iOS 真机测试、Firestore rules | 全链路体验打磨 | Week 7-8 |
+| **Phase 7: 润色 & 联调** | framer-motion 动效统一、触感反馈审查、iOS 真机测试、Supabase RLS policies | 全链路体验打磨 | Week 7-8 |
 | **Phase 7: 内测 & 修复** | 双人邀请码配对、引导流程、边界情况修复、性能优化 | Beta 版本 | Week 7-8 |
 | **🏁 Beta Launch** | 邀请真实情侣内测，收集反馈 | 上线 | Week 8 末 |
 
@@ -769,7 +769,7 @@ AI 建议均**可关闭**（右上角 X），用户可反馈 👍/👎。所有 
 - [ ] 离线场景策略：记账录入离线可用，但日历事件添加是否需要在线？（防重复事件）Owner: Dev
 - [ ] AI 报告生成时机：每月 1 号自动生成 vs 用户主动触发？（前者体验好但有成本）Owner: Product
 - [ ] 用户数据导出格式：是否支持 CSV/JSON 导出？Owner: Product
-- [ ] 照片存储方案：Firebase Storage vs 压缩后存 Firestore base64？（成本与体验权衡）Owner: Dev
+- [ ] 照片存储方案：Supabase Storage vs 压缩后存数据库 base64？（成本与体验权衡）Owner: Dev
 - [ ] PWA 更新策略：检测到新版本时自动刷新 vs 弹窗提示更新？Owner: Dev
 
 ## Appendix

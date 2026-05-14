@@ -54,6 +54,16 @@ export interface CalendarEvent {
   note?: string
 }
 
+export interface Pair {
+  id: string
+  pair_code: string
+  members: string[]
+  budget_total: number
+  budget_categories: Record<string, number> | null
+  created_at: string
+  updated_at: string
+}
+
 export interface ExpenseFormData {
   amount: number
   category: ExpenseCategory
