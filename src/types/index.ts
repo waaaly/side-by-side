@@ -45,6 +45,15 @@ export interface FoodMemory {
   note?: string
 }
 
+export interface CalendarEvent {
+  id: string
+  type: 'period_start' | 'period_end' | 'anniversary' | 'birthday' | 'schedule'
+  title: string
+  date: string
+  repeat?: boolean
+  note?: string
+}
+
 export interface ExpenseFormData {
   amount: number
   category: ExpenseCategory

@@ -3,15 +3,15 @@
   "meta": {
     "description": "SideBySide 开发进度记录文件。每次开发前读取此文件了解当前进度，开发完成后更新任务状态。",
     "version": "1.0",
-    "lastUpdated": "2026-05-14T19:00:00+08:00"
+    "lastUpdated": "2026-05-14T19:30:00+08:00"
   },
   "project": {
     "name": "SideBySide (SBS)",
-    "phase": "kitchen-mvp",
-    "overallProgress": 33,
+    "phase": "calendar-mvp",
+    "overallProgress": 45,
     "startDate": "2026-05-14",
     "targetDate": "2026-07-09",
-    "currentSprint": "Phase 3: 食谱 MVP"
+    "currentSprint": "Phase 4: 日历 MVP"
   },
   "modules": [
     {
@@ -56,18 +56,18 @@
       "id": "module-calendar",
       "name": "📅 日历模块",
       "route": "/calendar",
-      "status": "pending",
-      "progress": 0,
+      "status": "completed",
+      "progress": 100,
       "features": [
-        { "id": "cal-001", "name": "月视图日历（上下月切换）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "FR-21", "notes": "包含今天高亮" },
-        { "id": "cal-002", "name": "生理期标记（开始/结束 + 粉色区间）", "priority": "P0", "status": "pending", "usRef": "US-11", "frRef": "FR-22,FR-23", "notes": "渐变粉色高亮，双人可见" },
-        { "id": "cal-003", "name": "纪念日标记（爱心高亮，可重复）", "priority": "P0", "status": "pending", "usRef": "US-12", "frRef": "FR-24", "notes": "自定义日期 + 标题 + 每年重复" },
-        { "id": "cal-004", "name": "生日标记（蛋糕高亮，可重复）", "priority": "P0", "status": "pending", "usRef": "US-12", "frRef": "FR-25", "notes": "自定义日期 + 姓名" },
-        { "id": "cal-005", "name": "日程事件（P1）", "priority": "P1", "status": "pending", "usRef": "US-13", "frRef": "FR-26", "notes": "自定义单次 + 标题 + 备注" },
-        { "id": "cal-006", "name": "日期详情面板", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "选中日期展示全部事件 + AI 卡片" },
-        { "id": "cal-007", "name": "日期小圆点聚合标记", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "FR-29", "notes": "日期下方小圆点标记事件类型" },
-        { "id": "cal-008", "name": "重复事件删除逻辑", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "弹窗确认"仅删除今年"/"删除所有"" },
-        { "id": "cal-009", "name": "跨月生理期衔接", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "开始月末结束下月自动衔接" },
+        { "id": "cal-001", "name": "月视图日历（上下月切换）", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-21", "notes": "Calendar 组件，含 spring 动画" },
+        { "id": "cal-002", "name": "生理期标记（开始/结束 + 粉色区间）", "priority": "P0", "status": "completed", "usRef": "US-11", "frRef": "FR-22,FR-23", "notes": "period_start/end 事件，渐变粉色高亮区间" },
+        { "id": "cal-003", "name": "纪念日标记（爱心高亮，可重复）", "priority": "P0", "status": "completed", "usRef": "US-12", "frRef": "FR-24", "notes": "Bottom Sheet 表单，重复切换" },
+        { "id": "cal-004", "name": "生日标记（蛋糕高亮，可重复）", "priority": "P0", "status": "completed", "usRef": "US-12", "frRef": "FR-25", "notes": "Bottom Sheet 表单，重复切换" },
+        { "id": "cal-005", "name": "日程事件（P1）", "priority": "P1", "status": "completed", "usRef": "US-13", "frRef": "FR-26", "notes": "单次日程 + 备注" },
+        { "id": "cal-006", "name": "日期详情面板", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "底部抽屉展示当天事件 + 添加/删除按钮" },
+        { "id": "cal-007", "name": "日期小圆点聚合标记", "priority": "P1", "status": "completed", "usRef": "—", "frRef": "FR-29", "notes": "🩸❤️🎂📅 小图标标记" },
+        { "id": "cal-008", "name": "重复事件删除逻辑", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "弹窗确认"仅删除今年"/"删除所有"" },
+        { "id": "cal-009", "name": "跨月生理期衔接", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "period_ranges 算法按日期比较，跨月自然衔接" },
         { "id": "cal-010", "name": "T-1 提醒卡片（含 AI 建议）", "priority": "P1", "status": "pending", "usRef": "US-14,US-15", "frRef": "FR-27,FR-28", "notes": "首页 + 日历页，纪念日/生理期 AI 行动建议" }
       ]
     },
@@ -166,13 +166,13 @@
   ],
   "summary": {
     "totalFeatures": 75,
-    "completed": 24,
+    "completed": 33,
     "inProgress": 0,
-    "pending": 51,
+    "pending": 42,
     "statusBreakdown": {
-      "completed": ["global-001", "global-002", "global-003", "global-004", "global-005", "global-006", "global-007", "nav-001", "nav-002", "nav-003", "nav-004", "budget-001", "budget-002", "budget-003", "budget-004", "budget-005", "budget-006", "budget-007", "kitchen-001", "kitchen-002", "kitchen-003", "kitchen-004", "kitchen-005", "kitchen-006"],
+      "completed": ["global-001", "global-002", "global-003", "global-004", "global-005", "global-006", "global-007", "nav-001", "nav-002", "nav-003", "nav-004", "budget-001", "budget-002", "budget-003", "budget-004", "budget-005", "budget-006", "budget-007", "kitchen-001", "kitchen-002", "kitchen-003", "kitchen-004", "kitchen-005", "kitchen-006", "cal-001", "cal-002", "cal-003", "cal-004", "cal-005", "cal-006", "cal-007", "cal-008", "cal-009"],
       "inProgress": [],
-      "pending": "remaining 51 features"
+      "pending": "remaining 42 features"
     }
   },
   "agentInstructions": {
