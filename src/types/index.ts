@@ -1,12 +1,11 @@
 export type ExpenseCategory =
-  | 'food'
-  | 'transport'
-  | 'shopping'
-  | 'entertainment'
-  | 'housing'
-  | 'health'
-  | 'gift'
-  | 'other'
+  | 'dining' | 'vegetable' | 'fruit' | 'beverage' | 'alcohol' | 'snack'
+  | 'rent' | 'home' | 'daily' | 'communication' | 'utility'
+  | 'transit' | 'car' | 'travel' | 'hotel'
+  | 'general' | 'clothing' | 'beauty' | 'digital' | 'electronics' | 'entertainment' | 'sports' | 'social'
+  | 'books' | 'learning'
+  | 'elderly' | 'children' | 'giftMoney' | 'pet'
+  | 'medical' | 'delivery' | 'internet' | 'finance'
 
 export interface Expense {
   id: string
@@ -14,7 +13,6 @@ export interface Expense {
   category: ExpenseCategory
   description: string
   date: string
-  paidBy: 'me' | 'partner' | 'shared'
 }
 
 export interface Budget {
@@ -28,6 +26,7 @@ export interface Recipe {
   name: string
   emoji: string
   ingredients: string[]
+  tags?: string[]
 }
 
 export interface ShoppingItem {
@@ -35,4 +34,11 @@ export interface ShoppingItem {
   name: string
   completed: boolean
   note?: string
+}
+
+export interface ExpenseFormData {
+  amount: number
+  category: ExpenseCategory
+  description: string
+  date: string
 }

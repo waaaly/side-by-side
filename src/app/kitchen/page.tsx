@@ -5,11 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Shuffle,
   Sparkles,
-  ShoppingCart,
   Plus,
   Check,
   Trash2,
-  ChevronRight,
 } from 'lucide-react'
 import BottomNav from '@/components/BottomNav'
 import type { Recipe, ShoppingItem } from '@/types'

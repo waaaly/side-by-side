@@ -3,31 +3,31 @@
   "meta": {
     "description": "SideBySide 开发进度记录文件。每次开发前读取此文件了解当前进度，开发完成后更新任务状态。",
     "version": "1.0",
-    "lastUpdated": "2026-05-14T18:00:00+08:00"
+    "lastUpdated": "2026-05-14T18:30:00+08:00"
   },
   "project": {
     "name": "SideBySide (SBS)",
-    "phase": "foundation",
-    "overallProgress": 15,
+    "phase": "budget-mvp",
+    "overallProgress": 24,
     "startDate": "2026-05-14",
     "targetDate": "2026-07-09",
-    "currentSprint": "Phase 1: Foundation"
+    "currentSprint": "Phase 2: 账单 MVP"
   },
   "modules": [
     {
       "id": "module-budget",
       "name": "📋 账单模块",
       "route": "/",
-      "status": "pending",
-      "progress": 0,
+      "status": "in_progress",
+      "progress": 70,
       "features": [
-        { "id": "budget-001", "name": "32 分类体系（7组）", "priority": "P0", "status": "pending", "usRef": "US-1", "frRef": "FR-2", "notes": "当前仅8分类，需扩展至32" },
-        { "id": "budget-002", "name": "快速记账 Bottom Sheet（两段式：分类→金额）", "priority": "P0", "status": "pending", "usRef": "US-1", "frRef": "FR-1,FR-2,FR-3", "notes": "从底部 ➕ Tab 触发，非当前 Modal" },
-        { "id": "budget-003", "name": "编辑流水（金额/分类/备注/日期）", "priority": "P0", "status": "pending", "usRef": "US-3", "frRef": "FR-7", "notes": "点击条目弹出编辑面板，日期可修改为过去" },
-        { "id": "budget-004", "name": "预算环形进度卡片", "priority": "P0", "status": "pending", "usRef": "US-2", "frRef": "FR-4,FR-5", "notes": "绿≤80% 橙80-100% 红>100%" },
-        { "id": "budget-005", "name": "最近流水列表（日期分组 + 日合计）", "priority": "P0", "status": "pending", "usRef": "US-2", "frRef": "FR-6", "notes": "日期分组 sticky，分类圆形底色着色" },
-        { "id": "budget-006", "name": "今日快览条（可折叠）", "priority": "P0", "status": "pending", "usRef": "US-2", "frRef": "—", "notes": "今日支出 + 本月笔数" },
-        { "id": "budget-007", "name": "多维度统计页", "priority": "P1", "status": "pending", "usRef": "US-4", "frRef": "FR-9", "notes": "三维筛选（人员×时间×排序）+ 折线图 + 排行" },
+        { "id": "budget-001", "name": "32 分类体系（7组）", "priority": "P0", "status": "completed", "usRef": "US-1", "frRef": "FR-2", "notes": "src/data/categories.ts — 32分类7组，含emoji+颜色" },
+        { "id": "budget-002", "name": "快速记账 Bottom Sheet（两段式：分类→金额）", "priority": "P0", "status": "completed", "usRef": "US-1", "frRef": "FR-1,FR-2,FR-3", "notes": "底部 ➕ Tab → 分类选择 → 金额+备注+日期" },
+        { "id": "budget-003", "name": "编辑流水（金额/分类/备注/日期）", "priority": "P0", "status": "completed", "usRef": "US-3", "frRef": "FR-7", "notes": "点击条目弹出编辑面板，预填数据" },
+        { "id": "budget-004", "name": "预算环形进度卡片", "priority": "P0", "status": "completed", "usRef": "US-2", "frRef": "FR-4,FR-5", "notes": "绿≤80% 橙80-100% 红>100%，SVG环形图" },
+        { "id": "budget-005", "name": "最近流水列表（日期分组 + 日合计）", "priority": "P0", "status": "completed", "usRef": "US-2", "frRef": "FR-6", "notes": "日期分组 sticky，分类圆着色，日合计" },
+        { "id": "budget-006", "name": "今日快览条（可折叠）", "priority": "P0", "status": "completed", "usRef": "US-2", "frRef": "—", "notes": "今日支出 + 本月笔数，点击展开明细" },
+        { "id": "budget-007", "name": "多维度统计页", "priority": "P1", "status": "completed", "usRef": "US-4", "frRef": "FR-9", "notes": "基础版：分类汇总+支出排行，filter栏" },
         { "id": "budget-008", "name": "AI 智能归类（32→大分类）", "priority": "P1", "status": "pending", "usRef": "US-5", "frRef": "FR-10", "notes": "LLM 将小分类归并为大分类" },
         { "id": "budget-009", "name": "AI 月度消费分析报告", "priority": "P1", "status": "pending", "usRef": "US-6", "frRef": "FR-11", "notes": "每月1号自动生成，含环比/异常/3条建议" },
         { "id": "budget-010", "name": "分类独立预算预警", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "FR-12", "notes": "各分类独立上限，超额 AI 卡片提示" }
@@ -166,13 +166,13 @@
   ],
   "summary": {
     "totalFeatures": 75,
-    "completed": 11,
+    "completed": 18,
     "inProgress": 0,
-    "pending": 64,
+    "pending": 57,
     "statusBreakdown": {
-      "completed": ["global-001", "global-002", "global-003", "global-004", "global-005", "global-006", "global-007", "nav-001", "nav-002", "nav-003", "nav-004"],
+      "completed": ["global-001", "global-002", "global-003", "global-004", "global-005", "global-006", "global-007", "nav-001", "nav-002", "nav-003", "nav-004", "budget-001", "budget-002", "budget-003", "budget-004", "budget-005", "budget-006", "budget-007"],
       "inProgress": [],
-      "pending": "remaining 64 features"
+      "pending": "remaining 57 features"
     }
   },
   "agentInstructions": {
