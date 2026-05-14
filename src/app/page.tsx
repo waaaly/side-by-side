@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  Plus,
   Utensils,
   Car,
   ShoppingBag,
@@ -183,22 +182,7 @@ export default function BudgetPage() {
         </div>
       </div>
 
-      {/* FAB */}
-      <div
-        className="flex justify-center"
-        style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
-      >
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsModalOpen(true)}
-          className="w-14 h-14 rounded-full bg-gradient-to-r from-brand-pink to-brand-rose text-white shadow-lg shadow-brand-pink/30 flex items-center justify-center -mt-7 z-10"
-        >
-          <Plus size={26} />
-        </motion.button>
-      </div>
-
-      <BottomNav />
+      <BottomNav onAddExpense={() => setIsModalOpen(true)} />
 
       <AddExpenseModal
         isOpen={isModalOpen}

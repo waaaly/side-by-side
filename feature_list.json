@@ -1,0 +1,183 @@
+{
+  "$schema": "feature_list.json",
+  "meta": {
+    "description": "SideBySide 开发进度记录文件。每次开发前读取此文件了解当前进度，开发完成后更新任务状态。",
+    "version": "1.0",
+    "lastUpdated": "2026-05-14T18:00:00+08:00"
+  },
+  "project": {
+    "name": "SideBySide (SBS)",
+    "phase": "foundation",
+    "overallProgress": 15,
+    "startDate": "2026-05-14",
+    "targetDate": "2026-07-09",
+    "currentSprint": "Phase 1: Foundation"
+  },
+  "modules": [
+    {
+      "id": "module-budget",
+      "name": "📋 账单模块",
+      "route": "/",
+      "status": "pending",
+      "progress": 0,
+      "features": [
+        { "id": "budget-001", "name": "32 分类体系（7组）", "priority": "P0", "status": "pending", "usRef": "US-1", "frRef": "FR-2", "notes": "当前仅8分类，需扩展至32" },
+        { "id": "budget-002", "name": "快速记账 Bottom Sheet（两段式：分类→金额）", "priority": "P0", "status": "pending", "usRef": "US-1", "frRef": "FR-1,FR-2,FR-3", "notes": "从底部 ➕ Tab 触发，非当前 Modal" },
+        { "id": "budget-003", "name": "编辑流水（金额/分类/备注/日期）", "priority": "P0", "status": "pending", "usRef": "US-3", "frRef": "FR-7", "notes": "点击条目弹出编辑面板，日期可修改为过去" },
+        { "id": "budget-004", "name": "预算环形进度卡片", "priority": "P0", "status": "pending", "usRef": "US-2", "frRef": "FR-4,FR-5", "notes": "绿≤80% 橙80-100% 红>100%" },
+        { "id": "budget-005", "name": "最近流水列表（日期分组 + 日合计）", "priority": "P0", "status": "pending", "usRef": "US-2", "frRef": "FR-6", "notes": "日期分组 sticky，分类圆形底色着色" },
+        { "id": "budget-006", "name": "今日快览条（可折叠）", "priority": "P0", "status": "pending", "usRef": "US-2", "frRef": "—", "notes": "今日支出 + 本月笔数" },
+        { "id": "budget-007", "name": "多维度统计页", "priority": "P1", "status": "pending", "usRef": "US-4", "frRef": "FR-9", "notes": "三维筛选（人员×时间×排序）+ 折线图 + 排行" },
+        { "id": "budget-008", "name": "AI 智能归类（32→大分类）", "priority": "P1", "status": "pending", "usRef": "US-5", "frRef": "FR-10", "notes": "LLM 将小分类归并为大分类" },
+        { "id": "budget-009", "name": "AI 月度消费分析报告", "priority": "P1", "status": "pending", "usRef": "US-6", "frRef": "FR-11", "notes": "每月1号自动生成，含环比/异常/3条建议" },
+        { "id": "budget-010", "name": "分类独立预算预警", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "FR-12", "notes": "各分类独立上限，超额 AI 卡片提示" }
+      ]
+    },
+    {
+      "id": "module-kitchen",
+      "name": "🍳 食谱模块",
+      "route": "/kitchen",
+      "status": "pending",
+      "progress": 0,
+      "features": [
+        { "id": "kitchen-001", "name": "食谱库 CRUD（名称/emoji/食材/标签）", "priority": "P0", "status": "pending", "usRef": "US-7", "frRef": "FR-10", "notes": "搜索 + 标签筛选" },
+        { "id": "kitchen-002", "name": "盲盒抽菜（随机 + spring 动画）", "priority": "P0", "status": "pending", "usRef": "US-8", "frRef": "FR-12,FR-13", "notes": "0.8s shuffle → emoji闪烁 → 菜名渐入" },
+        { "id": "kitchen-003", "name": "盲盒空状态", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "空食谱库时显示引导插画" },
+        { "id": "kitchen-004", "name": "买菜清单（双人实时同步）", "priority": "P0", "status": "pending", "usRef": "US-10", "frRef": "FR-15", "notes": "添加/勾选划线动画/删除" },
+        { "id": "kitchen-005", "name": "食材快捷加入清单", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "FR-14", "notes": "盲盒食材旁 + 按钮" },
+        { "id": "kitchen-006", "name": "美食记忆墙（文字版）", "priority": "P0", "status": "pending", "usRef": "US-9", "frRef": "FR-16,FR-17", "notes": "时间线：日期 + 菜名 + emoji" },
+        { "id": "kitchen-007", "name": "美食拍照上传", "priority": "P1", "status": "pending", "usRef": "US-9", "frRef": "FR-18", "notes": "相机/相册 → 记忆墙配图" },
+        { "id": "kitchen-008", "name": "AI 标签推荐食谱", "priority": "P1", "status": "pending", "usRef": "US-14", "frRef": "FR-19", "notes": "经期→暖宫，季节→时令" },
+        { "id": "kitchen-009", "name": "AI 时令食材推荐", "priority": "P2", "status": "pending", "usRef": "US-16", "frRef": "FR-20", "notes": "月份→时令食材 → 匹配菜谱" },
+        { "id": "kitchen-010", "name": "清单一键转记账", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "—", "notes": "勾选清单 → 生成记账条目" }
+      ]
+    },
+    {
+      "id": "module-calendar",
+      "name": "📅 日历模块",
+      "route": "/calendar",
+      "status": "pending",
+      "progress": 0,
+      "features": [
+        { "id": "cal-001", "name": "月视图日历（上下月切换）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "FR-21", "notes": "包含今天高亮" },
+        { "id": "cal-002", "name": "生理期标记（开始/结束 + 粉色区间）", "priority": "P0", "status": "pending", "usRef": "US-11", "frRef": "FR-22,FR-23", "notes": "渐变粉色高亮，双人可见" },
+        { "id": "cal-003", "name": "纪念日标记（爱心高亮，可重复）", "priority": "P0", "status": "pending", "usRef": "US-12", "frRef": "FR-24", "notes": "自定义日期 + 标题 + 每年重复" },
+        { "id": "cal-004", "name": "生日标记（蛋糕高亮，可重复）", "priority": "P0", "status": "pending", "usRef": "US-12", "frRef": "FR-25", "notes": "自定义日期 + 姓名" },
+        { "id": "cal-005", "name": "日程事件（P1）", "priority": "P1", "status": "pending", "usRef": "US-13", "frRef": "FR-26", "notes": "自定义单次 + 标题 + 备注" },
+        { "id": "cal-006", "name": "日期详情面板", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "选中日期展示全部事件 + AI 卡片" },
+        { "id": "cal-007", "name": "日期小圆点聚合标记", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "FR-29", "notes": "日期下方小圆点标记事件类型" },
+        { "id": "cal-008", "name": "重复事件删除逻辑", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "弹窗确认"仅删除今年"/"删除所有"" },
+        { "id": "cal-009", "name": "跨月生理期衔接", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "开始月末结束下月自动衔接" },
+        { "id": "cal-010", "name": "T-1 提醒卡片（含 AI 建议）", "priority": "P1", "status": "pending", "usRef": "US-14,US-15", "frRef": "FR-27,FR-28", "notes": "首页 + 日历页，纪念日/生理期 AI 行动建议" }
+      ]
+    },
+    {
+      "id": "module-settings",
+      "name": "⚙️ 设置模块",
+      "route": "/settings",
+      "status": "pending",
+      "progress": 0,
+      "features": [
+        { "id": "settings-001", "name": "分类管理（32 分类网格 + 启用开关）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "FR-37", "notes": "网格列表显示 emoji+名称，停用隐藏但不影响历史" },
+        { "id": "settings-002", "name": "分类拖拽排序", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "FR-37", "notes": "自定义分类排序" },
+        { "id": "settings-003", "name": "食谱管理（搜索/筛选/编辑/删除）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "FR-38", "notes": "列表展示全部食谱" },
+        { "id": "settings-004", "name": "预算设置（月度总额 + 分类独立上限）", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "FR-39", "notes": "总预算默认5000，防≤0" },
+        { "id": "settings-005", "name": "日历事件管理", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "FR-40", "notes": "列表全部事件，编辑/删除/处理重复" },
+        { "id": "settings-006", "name": "个性化配置", "priority": "P2", "status": "pending", "usRef": "—", "frRef": "FR-41", "notes": "情侣昵称/主题色/数据导出CSV" }
+      ]
+    },
+    {
+      "id": "module-navigation",
+      "name": "全局导航",
+      "route": "global",
+      "status": "completed",
+      "progress": 100,
+      "features": [
+        { "id": "nav-001", "name": "5 Tab 底部导航（📋🍳➕📅⚙️）", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-42", "notes": "已重构为 5 Tab" },
+        { "id": "nav-002", "name": "➕ 居中凸出渐变按钮", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-43", "notes": "brand-pink→brand-rose 渐变，大25%+阴影" },
+        { "id": "nav-003", "name": "Tab 激活弹簧动画", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-44", "notes": "framer-motion 弹簧缩放" },
+        { "id": "nav-004", "name": "safe-area-inset-bottom 适配", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-45", "notes": "使用 CSS var(--safe-area-bottom)" }
+      ]
+    },
+    {
+      "id": "module-ai",
+      "name": "🤖 AI Agent 层",
+      "route": "cross-module",
+      "status": "pending",
+      "progress": 0,
+      "features": [
+        { "id": "ai-001", "name": "LLM API 接入（OpenAI/Claude）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "FR-30", "notes": "API route 或 client 调用" },
+        { "id": "ai-002", "name": "AI 智能归类（小→大分类）", "priority": "P1", "status": "pending", "usRef": "US-5", "frRef": "FR-10,FR-31", "notes": "Prompt 1：32分类归并为大分类" },
+        { "id": "ai-003", "name": "月度财务分析报告", "priority": "P1", "status": "pending", "usRef": "US-6", "frRef": "FR-31", "notes": "Prompt 2：双层分析+环比+异常+3条建议" },
+        { "id": "ai-004", "name": "AI 食谱推荐（经期/季节）", "priority": "P1", "status": "pending", "usRef": "US-14", "frRef": "FR-32", "notes": "从食谱库匹配推荐" },
+        { "id": "ai-005", "name": "AI 提醒建议（纪念日/生理期）", "priority": "P1", "status": "pending", "usRef": "US-14,US-15", "frRef": "FR-33", "notes": "日历事件 T-1 生成行动建议" },
+        { "id": "ai-006", "name": "AI 缓存策略（Firestore 缓存）", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "FR-34", "notes": "避免每次打开调用 API" },
+        { "id": "ai-007", "name": "AI 卡片 UI（流式打字 + 关闭/反馈）", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "—", "notes": "👍/👎 反馈，右上角 X 关闭" },
+        { "id": "ai-008", "name": "AI 异常降级（API 失败回退）", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "—", "notes": "失败→缓存上次报告→不阻塞页面" }
+      ]
+    },
+    {
+      "id": "module-data",
+      "name": "📦 数据层",
+      "route": "cross-module",
+      "status": "pending",
+      "progress": 0,
+      "features": [
+        { "id": "data-001", "name": "Firebase 项目配置 + SDK 集成", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "创建项目、安装SDK、配置索引" },
+        { "id": "data-002", "name": "Firestore 数据模型实现", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "pairs/expenses/recipes/shoppingList/foodMemories/calendarEvents/aiReports" },
+        { "id": "data-003", "name": "双人配对机制（邀请码）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "pairId 关联两用户" },
+        { "id": "data-004", "name": "自定义 Hooks（useExpenses 等）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "各模块数据操作 hooks" },
+        { "id": "data-005", "name": "Firestore 实时同步（onSnapshot）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "双人实时数据同步" },
+        { "id": "data-006", "name": "离线持久化 + 冲突处理", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "离线可用，最后写入胜出" },
+        { "id": "data-007", "name": "Firestore Security Rules", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "—", "notes": "仅 pair 成员可读写" }
+      ]
+    },
+    {
+      "id": "module-global",
+      "name": "🌐 全局 & PWA",
+      "route": "global",
+      "status": "in_progress",
+      "progress": 60,
+      "features": [
+        { "id": "global-001", "name": "PWA manifest + meta 标签", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "已配置 manifest.ts + layout meta" },
+        { "id": "global-002", "name": "Tailwind v4 Macaron 主题色", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "globals.css @theme 已定义" },
+        { "id": "global-003", "name": "Framer Motion 动效", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-49", "notes": "已安装 framer-motion 12.x" },
+        { "id": "global-004", "name": "h-screen + overflow-y-auto 限制", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-47", "notes": "各页面已使用 h-screen 容器，body 无全局滚动" },
+        { "id": "global-005", "name": "iOS 刘海屏 safe-area 适配", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-48", "notes": "CSS 变量 + body padding-top + nav padding-bottom 已配置" },
+        { "id": "global-006", "name": "所有按钮 active:scale-95 transition", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-46", "notes": "全局 .btn-physical utility class + 各组件内联使用" },
+        { "id": "global-007", "name": "prefers-reduced-motion 支持", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "—", "notes": "globals.css media query，动画时长归零" },
+        { "id": "global-008", "name": "PWA 更新策略（检测→提示→刷新）", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "—", "notes": "serviceWorker.update()" },
+        { "id": "global-009", "name": "首次使用引导流程 + 示例数据", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "—", "notes": "预设示例账单 + 示例食谱" },
+        { "id": "global-010", "name": "分模块动态加载（首屏 <1MB）", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "—", "notes": "next/dynamic + React.lazy" }
+      ]
+    },
+    {
+      "id": "module-testing",
+      "name": "🧪 测试",
+      "route": "cross-module",
+      "status": "pending",
+      "progress": 0,
+      "features": [
+        { "id": "test-001", "name": "单元测试框架搭建", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "—", "notes": "Vitest 配置" },
+        { "id": "test-002", "name": "集成测试（核心流程）", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "—", "notes": "记账→统计→AI / 盲盒→清单→记忆墙" },
+        { "id": "test-003", "name": "E2E 测试（用户旅程）", "priority": "P2", "status": "pending", "usRef": "—", "frRef": "—", "notes": "Playwright" }
+      ]
+    }
+  ],
+  "summary": {
+    "totalFeatures": 75,
+    "completed": 11,
+    "inProgress": 0,
+    "pending": 64,
+    "statusBreakdown": {
+      "completed": ["global-001", "global-002", "global-003", "global-004", "global-005", "global-006", "global-007", "nav-001", "nav-002", "nav-003", "nav-004"],
+      "inProgress": [],
+      "pending": "remaining 64 features"
+    }
+  },
+  "agentInstructions": {
+    "readBeforeDev": "每次开发前，读取此文件了解当前进度、待完成任务、已完成任务。",
+    "updateAfterDev": "开发完成后，更新相关 feature 的 status 为 completed，更新 project.overallProgress、modules[].progress、summary。",
+    "noteOnDependencies": "开发时请参考 docs/development-plan.md 中的依赖关系和 phase 顺序。"
+  }
+}
