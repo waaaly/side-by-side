@@ -7,8 +7,8 @@ import { Receipt, ChefHat, Heart } from 'lucide-react'
 
 const tabs = [
   { href: '/', label: '记账', icon: Receipt },
-  { href: '/recipes', label: '厨房', icon: ChefHat },
-  { href: '/us', label: '我们的', icon: Heart },
+  { href: '/kitchen', label: '厨房', icon: ChefHat },
+  { href: '/calendar', label: '我们的', icon: Heart },
 ]
 
 export default function BottomNav() {

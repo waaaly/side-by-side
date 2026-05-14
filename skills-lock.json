@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "skills": {
+    "deliver-acceptance-criteria": {
+      "source": "product-on-purpose/pm-skills",
+      "sourceType": "github",
+      "computedHash": "e4e51d2c5ab5b2f160482252f0236ab3e42007e9efe9d2b5db10c38069a75ac0"
+    },
+    "deliver-edge-cases": {
+      "source": "product-on-purpose/pm-skills",
+      "sourceType": "github",
+      "computedHash": "d9090bbe9e8b70b2d1fb5ac7681e40a08de8c2e9afb2801037780c2446029199"
+    },
+    "deliver-launch-checklist": {
+      "source": "product-on-purpose/pm-skills",
+      "sourceType": "github",
+      "computedHash": "fa71a18b99ea9f230b198dec578d983b1770d211891305747891f8130b8f06b8"
+    },
+    "deliver-prd": {
+      "source": "product-on-purpose/pm-skills",
+      "sourceType": "github",
+      "computedHash": "4540b6218ca321b6004ce2c35d1bbd51086cb81670dcc9bfdd9b66ad6406c048"
+    },
+    "deliver-release-notes": {
+      "source": "product-on-purpose/pm-skills",
+      "sourceType": "github",
+      "computedHash": "0fd078d086cead969df2ec8b54df97bc86e0a1458182aefe889c1dd9a4540598"
+    }
+  }
+}
