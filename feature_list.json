@@ -3,15 +3,15 @@
   "meta": {
     "description": "SideBySide 开发进度记录文件。每次开发前读取此文件了解当前进度，开发完成后更新任务状态。",
     "version": "1.0",
-    "lastUpdated": "2026-05-14T19:30:00+08:00"
+    "lastUpdated": "2026-05-14T20:00:00+08:00"
   },
   "project": {
     "name": "SideBySide (SBS)",
-    "phase": "calendar-mvp",
-    "overallProgress": 45,
+    "phase": "settings-mvp",
+    "overallProgress": 53,
     "startDate": "2026-05-14",
     "targetDate": "2026-07-09",
-    "currentSprint": "Phase 4: 日历 MVP"
+    "currentSprint": "Phase 5: 设置 MVP"
   },
   "modules": [
     {
@@ -75,14 +75,14 @@
       "id": "module-settings",
       "name": "⚙️ 设置模块",
       "route": "/settings",
-      "status": "pending",
-      "progress": 0,
+      "status": "completed",
+      "progress": 100,
       "features": [
-        { "id": "settings-001", "name": "分类管理（32 分类网格 + 启用开关）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "FR-37", "notes": "网格列表显示 emoji+名称，停用隐藏但不影响历史" },
-        { "id": "settings-002", "name": "分类拖拽排序", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "FR-37", "notes": "自定义分类排序" },
-        { "id": "settings-003", "name": "食谱管理（搜索/筛选/编辑/删除）", "priority": "P0", "status": "pending", "usRef": "—", "frRef": "FR-38", "notes": "列表展示全部食谱" },
-        { "id": "settings-004", "name": "预算设置（月度总额 + 分类独立上限）", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "FR-39", "notes": "总预算默认5000，防≤0" },
-        { "id": "settings-005", "name": "日历事件管理", "priority": "P1", "status": "pending", "usRef": "—", "frRef": "FR-40", "notes": "列表全部事件，编辑/删除/处理重复" },
+        { "id": "settings-001", "name": "分类管理（32 分类网格 + 启用开关）", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-37", "notes": "/settings/categories — 32分类网格、按组分、启用toggle" },
+        { "id": "settings-002", "name": "分类排序（上下箭头）", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-37", "notes": "↑↓ 按钮调整顺序，搜索过滤" },
+        { "id": "settings-003", "name": "食谱管理（搜索/筛选/删除）", "priority": "P0", "status": "completed", "usRef": "—", "frRef": "FR-38", "notes": "/settings/recipes — 搜索+标签筛选+删除" },
+        { "id": "settings-004", "name": "预算设置（月度总额 + 分类独立上限）", "priority": "P1", "status": "completed", "usRef": "—", "frRef": "FR-39", "notes": "/settings/budget — 总额+按分类独立上限" },
+        { "id": "settings-005", "name": "日历事件管理", "priority": "P1", "status": "completed", "usRef": "—", "frRef": "FR-40", "notes": "/settings/calendar — 列表+删除+重复事件确认" },
         { "id": "settings-006", "name": "个性化配置", "priority": "P2", "status": "pending", "usRef": "—", "frRef": "FR-41", "notes": "情侣昵称/主题色/数据导出CSV" }
       ]
     },
@@ -166,13 +166,13 @@
   ],
   "summary": {
     "totalFeatures": 75,
-    "completed": 33,
+    "completed": 38,
     "inProgress": 0,
-    "pending": 42,
+    "pending": 37,
     "statusBreakdown": {
-      "completed": ["global-001", "global-002", "global-003", "global-004", "global-005", "global-006", "global-007", "nav-001", "nav-002", "nav-003", "nav-004", "budget-001", "budget-002", "budget-003", "budget-004", "budget-005", "budget-006", "budget-007", "kitchen-001", "kitchen-002", "kitchen-003", "kitchen-004", "kitchen-005", "kitchen-006", "cal-001", "cal-002", "cal-003", "cal-004", "cal-005", "cal-006", "cal-007", "cal-008", "cal-009"],
+      "completed": ["global-001", "global-002", "global-003", "global-004", "global-005", "global-006", "global-007", "nav-001", "nav-002", "nav-003", "nav-004", "budget-001", "budget-002", "budget-003", "budget-004", "budget-005", "budget-006", "budget-007", "kitchen-001", "kitchen-002", "kitchen-003", "kitchen-004", "kitchen-005", "kitchen-006", "cal-001", "cal-002", "cal-003", "cal-004", "cal-005", "cal-006", "cal-007", "cal-008", "cal-009", "settings-001", "settings-002", "settings-003", "settings-004", "settings-005"],
       "inProgress": [],
-      "pending": "remaining 42 features"
+      "pending": "remaining 37 features"
     }
   },
   "agentInstructions": {
