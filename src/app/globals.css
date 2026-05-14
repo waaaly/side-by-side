@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  --font-nunito: "Nunito", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
   --color-brand-pink: #FF8FA3;
   --color-brand-amber: #FFC8A2;
   --color-brand-sage: #A8CBA9;

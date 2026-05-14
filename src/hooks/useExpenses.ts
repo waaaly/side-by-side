@@ -2,12 +2,32 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
+import { getCurrentUserId, getStoredPartnerId } from '@/lib/pairing'
 import type { Expense } from '@/types'
 
 export function useExpenses(pairId: string | null) {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [myId, setMyId] = useState<string | null>(null)
+
+  useEffect(() => {
+    getCurrentUserId().then(setMyId)
+  }, [])
+
+  const partnerId = getStoredPartnerId()
+
+  function toExpense(row: Record<string, unknown>): Expense {
+    const createdBy = row.created_by as string
+    return {
+      id: row.id as string,
+      amount: row.amount as number,
+      category: row.category as Expense['category'],
+      description: row.description as string,
+      date: row.date as string,
+      createdBy: createdBy === myId ? 'me' : createdBy === partnerId ? 'partner' : 'me',
+    }
+  }
 
   useEffect(() => {
     if (!pairId) return
@@ -24,7 +44,7 @@ export function useExpenses(pairId: string | null) {
       if (err) {
         setError(err.message)
       } else {
-        setExpenses((data ?? []) as unknown as Expense[])
+        setExpenses((data ?? []).map((r) => toExpense(r as Record<string, unknown>)))
       }
       setLoading(false)
     }
@@ -41,30 +61,36 @@ export function useExpenses(pairId: string | null) {
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [pairId])
+  }, [pairId, myId, partnerId])
 
   const addExpense = useCallback(async (
-    data: { amount: number; category: string; description: string; date: string },
+    data: { amount: number; category: string; description: string; date: string; createdBy?: string },
   ) => {
     if (!pairId) return null
     const supabase = createClient()
+    const userId = await getCurrentUserId()
     const { data: created, error: err } = await supabase
       .from('expenses')
-      .insert({ pair_id: pairId, ...data })
+      .insert({ pair_id: pairId, ...data, created_by: data.createdBy ?? userId })
       .select()
       .single()
     if (err) { setError(err.message); return null }
-    return created as unknown as Expense
+    return created ? toExpense(created as Record<string, unknown>) : null
   }, [pairId])
 
   const updateExpense = useCallback(async (
     id: string,
-    updates: { amount?: number; category?: string; description?: string; date?: string },
+    updates: { amount?: number; category?: string; description?: string; date?: string; createdBy?: string },
   ) => {
     const supabase = createClient()
+    const dbUpdates: Record<string, unknown> = { ...updates, last_edited_at: new Date().toISOString() }
+    if (updates.createdBy) {
+      dbUpdates.created_by = updates.createdBy
+      delete dbUpdates.createdBy
+    }
     const { error: err } = await supabase
       .from('expenses')
-      .update({ ...updates, last_edited_at: new Date().toISOString() })
+      .update(dbUpdates)
       .eq('id', id)
     if (err) setError(err.message)
   }, [])
@@ -75,5 +101,5 @@ export function useExpenses(pairId: string | null) {
     if (err) setError(err.message)
   }, [])
 
-  return { expenses, addExpense, updateExpense, deleteExpense, loading, error }
+  return { expenses, addExpense, updateExpense, deleteExpense, loading, error, myId, partnerId }
 }

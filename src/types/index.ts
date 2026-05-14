@@ -13,6 +13,7 @@ export interface Expense {
   category: ExpenseCategory
   description: string
   date: string
+  createdBy?: 'me' | 'partner'
 }
 
 export interface Budget {
@@ -69,4 +70,5 @@ export interface ExpenseFormData {
   category: ExpenseCategory
   description: string
   date: string
+  createdBy?: 'me' | 'partner'
 }

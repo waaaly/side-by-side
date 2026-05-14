@@ -27,7 +27,7 @@ const periodOptions: { value: PeriodFilter; label: string }[] = [
 
 export default function StatsPage() {
   const pairId = getStoredPairId()
-  const { expenses } = useExpenses(pairId)
+  const { expenses, myId, partnerId } = useExpenses(pairId)
 
   const [person, setPerson] = useState<PersonFilter>('all')
   const [period, setPeriod] = useState<PeriodFilter>('month')
@@ -35,8 +35,11 @@ export default function StatsPage() {
   const [showPeriodDropdown, setShowPeriodDropdown] = useState(false)
 
   const filteredExpenses = useMemo(() => {
-    return expenses
-  }, [expenses])
+    let result = expenses
+    if (person === 'me' && myId) result = result.filter((e) => e.createdBy === 'me' || e.createdBy === myId)
+    if (person === 'partner' && partnerId) result = result.filter((e) => e.createdBy === 'partner' || e.createdBy === partnerId)
+    return result
+  }, [expenses, person, myId, partnerId])
 
   const totalSpent = useMemo(
     () => filteredExpenses.reduce((sum, e) => sum + e.amount, 0),

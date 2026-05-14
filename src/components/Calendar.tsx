@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { solarToLunar, getSolarTerm, getHolidayName, isHoliday } from '@/lib/chinese-calendar'
 import type { CalendarEvent } from '@/types'
 
 interface Props {
@@ -70,9 +71,9 @@ export default function Calendar({ currentMonth, events, onDateClick, onPrevMont
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-white rounded-3xl p-5 shadow-sm"
+      className="bg-white rounded-3xl p-4 shadow-sm"
     >
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-4">
         <button onClick={onPrevMonth} className="p-1 active:scale-95 transition">
           <ChevronLeft size={20} className="text-gray-400" />
         </button>
@@ -82,13 +83,13 @@ export default function Calendar({ currentMonth, events, onDateClick, onPrevMont
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center mb-2">
+      <div className="grid grid-cols-7 gap-0.5 text-center mb-2">
         {DAYS.map((d) => (
-          <span key={d} className="text-xs text-gray-400 font-medium py-1">{d}</span>
+          <span key={d} className="text-[10px] text-gray-400 font-medium py-1">{d}</span>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-0.5">
         {days.map((day, i) => {
           if (!day) return <div key={i} />
           const ds = `${year}-${pad(month + 1)}-${pad(day)}`
@@ -96,19 +97,31 @@ export default function Calendar({ currentMonth, events, onDateClick, onPrevMont
           const inPeriod = isPeriod(ds)
           const dots = getEventDotTypes(events, ds)
 
+          const lunar = solarToLunar(year, month + 1, day)
+          const term = getSolarTerm(ds)
+          const holidayName = getHolidayName(ds)
+          const isHolidayDay = isHoliday(ds)
+
+          const lunarLabel = lunar && lunar.day === 1
+            ? `${lunar.monthName}月`
+            : lunar?.dayName ?? ''
+
           return (
             <button
               key={i}
               onClick={() => onDateClick(ds)}
-              className="relative flex flex-col items-center py-1 active:scale-90 transition min-h-[52px]"
+              className="relative flex flex-col items-center py-1 active:scale-90 transition min-h-[62px]"
             >
+              {/* 日期圆 */}
               <div
-                className={`w-9 h-9 flex items-center justify-center rounded-full text-sm relative ${
+                className={`w-8 h-8 flex items-center justify-center rounded-full text-xs relative ${
                   isToday
                     ? 'bg-brand-pink text-white font-semibold'
                     : inPeriod
                       ? 'text-brand-pink font-medium'
-                      : 'text-brand-text hover:bg-brand-pink/10'
+                      : isHolidayDay
+                        ? 'text-brand-coral font-medium'
+                        : 'text-brand-text hover:bg-brand-pink/10'
                 }`}
               >
                 {inPeriod && !isToday && (
@@ -116,10 +129,25 @@ export default function Calendar({ currentMonth, events, onDateClick, onPrevMont
                 )}
                 <span className="relative z-10">{day}</span>
               </div>
+
+              {/* 农历 / 节气 / 节假日 */}
+              <div className="h-[14px] flex items-center justify-center">
+                {term ? (
+                  <span className="text-[8px] text-brand-sage font-medium leading-none">{term}</span>
+                ) : holidayName ? (
+                  <span className={`text-[8px] font-medium leading-none ${isHolidayDay ? 'text-brand-coral' : 'text-gray-400'}`}>
+                    {holidayName}
+                  </span>
+                ) : lunarLabel ? (
+                  <span className="text-[8px] text-gray-300 leading-none">{lunarLabel}</span>
+                ) : null}
+              </div>
+
+              {/* 事件圆点 */}
               {dots.length > 0 && (
-                <div className="flex gap-0.5 mt-0.5 h-3">
+                <div className="flex gap-0.5 mt-[1px] h-[10px]">
                   {dots.map((t) => (
-                    <span key={t} className="text-[7px] leading-none">{DOT_ICON[t] || '•'}</span>
+                    <span key={t} className="text-[6px] leading-none">{DOT_ICON[t] || '•'}</span>
                   ))}
                 </div>
               )}

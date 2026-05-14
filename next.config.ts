@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['192.168.100.114','192.168.56.1'],
+  devIndicators: false,
   // 1. 极其重要：开启静态导出模式，编译后会生成纯 HTML/CSS/JS 文件
   output: 'export',
   

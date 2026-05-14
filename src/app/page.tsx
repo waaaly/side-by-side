@@ -53,7 +53,7 @@ function currentMonthStr(): string {
 
 export default function BudgetPage() {
   const pairId = getStoredPairId()
-  const { expenses, addExpense, updateExpense } = useExpenses(pairId)
+  const { expenses, addExpense, updateExpense, myId } = useExpenses(pairId)
   const { total: budgetTotal } = useBudget(pairId)
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -83,12 +83,12 @@ export default function BudgetPage() {
       if (editExpense) {
         updateExpense(editExpense.id, data)
       } else {
-        addExpense(data)
+        addExpense({ ...data, createdBy: myId ?? undefined })
       }
       setEditExpense(null)
       setIsModalOpen(false)
     },
-    [editExpense, addExpense, updateExpense],
+    [editExpense, addExpense, updateExpense, myId],
   )
 
   const handleEdit = (expense: Expense) => {
@@ -113,7 +113,7 @@ export default function BudgetPage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-4"
+          className="flex items-center justify-between mb-2"
         >
           <div>
             <h1 className="text-xl font-bold text-brand-text">💰 记账</h1>
@@ -232,6 +232,13 @@ export default function BudgetPage() {
                       <div key={exp.id} className="flex items-center gap-2 text-sm">
                         <span>{cat?.emoji || '📝'}</span>
                         <span className="flex-1 text-gray-500 truncate">{exp.description}</span>
+                        {exp.createdBy && (
+                          <span className={`text-[9px] px-1.5 py-[1px] rounded-full font-medium ${
+                            exp.createdBy === 'me' ? 'bg-brand-pink/10 text-brand-pink' : 'bg-brand-sage/10 text-brand-sage'
+                          }`}>
+                            {exp.createdBy === 'me' ? '我' : 'TA'}
+                          </span>
+                        )}
                         <span className="font-medium text-brand-text tabular">-¥{exp.amount}</span>
                       </div>
                     )
@@ -286,9 +293,20 @@ export default function BudgetPage() {
                             <p className="text-sm font-medium text-brand-text truncate">
                               {exp.description || cat?.label || exp.category}
                             </p>
-                            <p className="text-[10px] text-gray-400 mt-0.5">
-                              {cat?.label || exp.category}
-                            </p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="text-[10px] text-gray-400">
+                                {cat?.label || exp.category}
+                              </span>
+                              {exp.createdBy && (
+                                <span className={`text-[9px] px-1.5 py-[1px] rounded-full font-medium ${
+                                  exp.createdBy === 'me'
+                                    ? 'bg-brand-pink/10 text-brand-pink'
+                                    : 'bg-brand-sage/10 text-brand-sage'
+                                }`}>
+                                  {exp.createdBy === 'me' ? '我' : 'TA'}
+                                </span>
+                              )}
+                            </div>
                           </div>
                           <span className="text-sm font-semibold text-brand-text tabular flex-shrink-0">
                             -¥{exp.amount}
