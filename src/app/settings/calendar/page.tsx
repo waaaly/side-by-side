@@ -60,8 +60,7 @@ export default function CalendarEventsSettingsPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <div className="flex-1 overflow-y-auto px-5 pt-3 pb-2">
+    <div className="px-5 pt-3 pb-2">
         <div className="flex items-center gap-3 mb-4">
           <Link href="/settings" className="active:scale-95 transition">
             <ArrowLeft size={20} className="text-gray-400" />
@@ -103,7 +102,6 @@ export default function CalendarEventsSettingsPage() {
             <p className="text-xs text-gray-400 text-center py-8">暂无日历事件</p>
           )}
         </div>
-      </div>
 
       <AnimatePresence>
         {showConfirm && (

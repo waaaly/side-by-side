@@ -79,8 +79,7 @@ export default function StatsPage() {
   const maxCategoryAmount = Math.max(...categoryBreakdown.map((c) => c.amount), 1)
 
   return (
-    <div className="h-screen flex flex-col">
-      <div className="flex-1 overflow-y-auto px-5 pt-3 pb-2">
+    <div className="px-5 pt-3 pb-2">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -238,6 +237,5 @@ export default function StatsPage() {
           </div>
         </div>
       </div>
-    </div>
   )
 }

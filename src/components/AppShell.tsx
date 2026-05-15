@@ -12,7 +12,7 @@ function ShellInner({ children }: { children: ReactNode }) {
   const { onAddExpense } = useNav()
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-brand-cream">
+    <div className="h-screen flex flex-col overflow-hidden bg-brand-cream safe-area-top">
       <OfflineIndicator />
       <main className="flex-1 overflow-y-auto">
         {children}
@@ -36,7 +36,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   if (!user && pathname !== '/auth') {
     return (
-      <div className="h-screen bg-brand-cream flex flex-col overflow-hidden">
+      <div className="h-screen bg-brand-cream flex flex-col overflow-hidden safe-area-top">
         <OfflineIndicator />
         <AuthScreen />
       </div>

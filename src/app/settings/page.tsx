@@ -6,7 +6,7 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 
 const settingsItems = [
-  { icon: '💞', label: '配对管理', desc: '邀请伴侣、查看配对状态', href: '/settings/pairing' },
+  { icon: '💞', label: '配对管理', desc: '创建配对、邀请伴侣、查看状态', href: '/settings/pairing' },
   { icon: '📂', label: '分类管理', desc: '管理消费分类的图标、名称和排序', href: '/settings/categories' },
   { icon: '🍳', label: '食谱管理', desc: '管理食谱库中的全部菜谱', href: '/settings/recipes' },
   { icon: '💰', label: '预算设置', desc: '设定月度预算和各分类上限', href: '/settings/budget' },

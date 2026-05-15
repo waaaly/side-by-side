@@ -18,16 +18,25 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const basePath = process.env.NODE_ENV === 'production' ? '/side-by-side' : ''
+
 export const metadata: Metadata = {
   title: "Side by Side",
   description: "属于我们的小世界",
+  icons: {
+    icon: [
+      { url: `${basePath}/icons/icon-192x192.png`, sizes: "192x192", type: "image/png" },
+      { url: `${basePath}/icons/icon-512x512.png`, sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: `${basePath}/icons/apple-icon.png`, sizes: "180x180", type: "image/png" },
+      { url: `${basePath}/icons/icon-192x192.png`, sizes: "192x192", type: "image/png" },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "Side by Side",
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
   },
 };
 
