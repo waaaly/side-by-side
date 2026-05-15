@@ -19,14 +19,15 @@ export function useExpenses(pairId: string | null) {
 
   function toExpense(row: Record<string, unknown>): Expense {
     const createdBy = row.created_by as string
-    return {
-      id: row.id as string,
-      amount: row.amount as number,
-      category: row.category as Expense['category'],
-      description: row.description as string,
-      date: row.date as string,
-      createdBy: createdBy === myId ? 'me' : createdBy === partnerId ? 'partner' : 'me',
-    }
+      return {
+        id: row.id as string,
+        amount: row.amount as number,
+        category: row.category as Expense['category'],
+        description: row.description as string,
+        date: row.date as string,
+        recipeId: (row.recipe_id as string) ?? undefined,
+        createdBy: createdBy === myId ? 'me' : createdBy === partnerId ? 'partner' : 'me',
+      }
   }
 
   useEffect(() => {
@@ -64,14 +65,15 @@ export function useExpenses(pairId: string | null) {
   }, [pairId, myId, partnerId])
 
   const addExpense = useCallback(async (
-    data: { amount: number; category: string; description: string; date: string; createdBy?: string },
+    data: { amount: number; category: string; description: string; date: string; recipeId?: string; createdBy?: string },
   ) => {
     if (!pairId) return null
     const supabase = createClient()
     const userId = await getCurrentUserId()
+    const { recipeId, ...rest } = data
     const { data: created, error: err } = await supabase
       .from('expenses')
-      .insert({ pair_id: pairId, ...data, created_by: data.createdBy ?? userId })
+      .insert({ pair_id: pairId, ...rest, recipe_id: recipeId ?? null, created_by: data.createdBy ?? userId })
       .select()
       .single()
     if (err) { setError(err.message); return null }
@@ -80,13 +82,17 @@ export function useExpenses(pairId: string | null) {
 
   const updateExpense = useCallback(async (
     id: string,
-    updates: { amount?: number; category?: string; description?: string; date?: string; createdBy?: string },
+    updates: { amount?: number; category?: string; description?: string; date?: string; recipeId?: string; createdBy?: string },
   ) => {
     const supabase = createClient()
-    const dbUpdates: Record<string, unknown> = { ...updates, last_edited_at: new Date().toISOString() }
-    if (updates.createdBy) {
-      dbUpdates.created_by = updates.createdBy
-      delete dbUpdates.createdBy
+    const { recipeId, createdBy, ...rest } = updates
+    const dbUpdates: Record<string, unknown> = {
+      ...rest,
+      recipe_id: recipeId ?? null,
+      last_edited_at: new Date().toISOString(),
+    }
+    if (createdBy) {
+      dbUpdates.created_by = createdBy
     }
     const { error: err } = await supabase
       .from('expenses')

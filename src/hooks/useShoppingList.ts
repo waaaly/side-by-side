@@ -53,5 +53,16 @@ export function useShoppingList(pairId: string | null) {
     await supabase.from('shopping_list').delete().eq('id', id)
   }, [])
 
-  return { items, addItem, toggleItem, deleteItem, loading }
+  const batchAddItems = useCallback(async (names: string[]) => {
+    if (!pairId || names.length === 0) return
+    const supabase = createClient()
+    const existing = items.map((i) => i.name)
+    const newItems = names.filter((n) => !existing.includes(n))
+    if (newItems.length === 0) return
+    await supabase
+      .from('shopping_list')
+      .insert(newItems.map((name) => ({ pair_id: pairId, name })))
+  }, [pairId, items])
+
+  return { items, addItem, toggleItem, deleteItem, batchAddItems, loading }
 }

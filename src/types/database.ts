@@ -36,6 +36,7 @@ export interface Database {
           category: string
           description: string
           date: string
+          recipe_id: string | null
           created_by: string | null
           created_at: string
           last_edited_at: string
@@ -47,6 +48,7 @@ export interface Database {
           category: string
           description?: string
           date: string
+          recipe_id?: string | null
           created_by?: string | null
         }
         Update: {
@@ -54,6 +56,7 @@ export interface Database {
           category?: string
           description?: string
           date?: string
+          recipe_id?: string | null
           last_edited_at?: string
         }
       }

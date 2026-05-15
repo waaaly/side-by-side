@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Search, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ArrowLeft, Search, ChevronLeft, ChevronRight } from 'lucide-react'
+import RecipeCard from '@/components/RecipeCard'
 import Link from 'next/link'
 import { useRecipesPaginated } from '@/hooks/useRecipesPaginated'
 import type { RecipeFilters } from '@/hooks/useRecipesPaginated'
-import type { Recipe } from '@/types'
 
 const CATEGORY_EMOJI: Record<string, string> = {
   '家常菜': '🍳', '川菜': '🌶️', '湘菜': '🌶️', '粤菜': '🥟',
@@ -17,12 +17,6 @@ const CATEGORY_EMOJI: Record<string, string> = {
 
 const CATEGORIES = ['', ...Object.keys(CATEGORY_EMOJI)]
 const DIFFICULTIES = ['全部', '简单', '中等', '困难']
-
-function recipeEmoji(recipe: { category?: string; name: string }): string {
-  if (recipe.category && CATEGORY_EMOJI[recipe.category]) return CATEGORY_EMOJI[recipe.category]
-  const match = recipe.name.match(/^(\p{Extended_Pictographic})/u)
-  return match?.[1] ?? '🍳'
-}
 
 export default function RecipesSettingsPage() {
   const [search, setSearch] = useState('')
@@ -159,8 +153,12 @@ export default function RecipesSettingsPage() {
           recipes.map((recipe) => (
             <RecipeCard
               key={recipe.id}
-              recipe={recipe}
-              onDelete={handleDelete}
+              name={recipe.name}
+              category={recipe.category}
+              difficulty={recipe.difficulty}
+              ingredientCount={recipe.ingredients.length}
+              stepCount={recipe.steps.length}
+              onDelete={() => handleDelete(recipe.id)}
             />
           ))
         )}
@@ -216,81 +214,4 @@ export default function RecipesSettingsPage() {
   )
 }
 
-function RecipeCard({ recipe, onDelete }: { recipe: Recipe; onDelete: (id: string) => void }) {
-  const [expanded, setExpanded] = useState(false)
 
-  return (
-    <motion.div
-      layout
-      className="bg-white rounded-2xl px-4 py-3 shadow-sm"
-    >
-      <div className="flex items-center gap-3">
-        <span className="text-xl">{recipeEmoji(recipe)}</span>
-        <button
-          className="flex-1 min-w-0 text-left"
-          onClick={() => setExpanded(!expanded)}
-        >
-          <p className="text-sm font-medium text-brand-text truncate">{recipe.name}</p>
-          <div className="flex flex-wrap items-center gap-1 mt-0.5">
-            {recipe.category && (
-              <span className="text-[9px] text-brand-amber bg-amber-50 px-1.5 py-0.5 rounded-full">
-                {recipe.category}
-              </span>
-            )}
-            {recipe.difficulty && (
-              <span className="text-[9px] text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded-full">
-                {recipe.difficulty}
-              </span>
-            )}
-            <span className="text-[9px] text-gray-300">
-              {recipe.ingredients.length}种食材{recipe.steps.length > 0 ? ` · ${recipe.steps.length}步` : ''}
-            </span>
-          </div>
-        </button>
-        <button onClick={() => onDelete(recipe.id)} className="p-1.5 active:scale-90 transition">
-          <Trash2 size={14} className="text-gray-300" />
-        </button>
-      </div>
-
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="pt-3 border-t border-gray-50 mt-3 space-y-3">
-              <div>
-                <p className="text-[10px] text-gray-400 mb-1 font-medium">食材</p>
-                <div className="flex flex-wrap gap-1">
-                  {recipe.ingredients.map((ing, i) => (
-                    <span
-                      key={i}
-                      className="text-[10px] text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full"
-                    >
-                      {ing.name}{ing.amount ? ` ${ing.amount}` : ''}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              {recipe.steps.length > 0 && (
-                <div>
-                  <p className="text-[10px] text-gray-400 mb-1 font-medium">步骤</p>
-                  <ol className="space-y-1">
-                    {recipe.steps.map((step, i) => (
-                      <li key={i} className="text-[10px] text-gray-500 flex gap-1.5">
-                        <span className="text-gray-300 min-w-[1rem]">{i + 1}.</span>
-                        <span>{step}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  )
-}

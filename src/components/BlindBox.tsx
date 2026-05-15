@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Shuffle, Sparkles, Plus, BookOpen, ChefHat, Swords } from 'lucide-react'
+import { Shuffle, Sparkles, BookOpen, ChefHat, Swords } from 'lucide-react'
 import type { Recipe } from '@/types'
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -21,12 +21,13 @@ function recipeEmoji(recipe: { category?: string; name: string }): string {
 interface Props {
   recipes: Recipe[]
   onAddIngredient: (name: string) => void
+  onAddAllIngredients: (names: string[]) => void
   onRecordMemory: (recipe: Recipe) => void
   onCheckIn?: (recipe: Recipe) => void
   onChallenge?: (recipe: Recipe) => void
 }
 
-export default function BlindBox({ recipes, onAddIngredient, onRecordMemory, onCheckIn, onChallenge }: Props) {
+export default function BlindBox({ recipes, onAddIngredient, onAddAllIngredients, onRecordMemory, onCheckIn, onChallenge }: Props) {
   const [currentRecipe, setCurrentRecipe] = useState<Recipe | null>(null)
   const [isDrawing, setIsDrawing] = useState(false)
 
@@ -91,18 +92,22 @@ export default function BlindBox({ recipes, onAddIngredient, onRecordMemory, onC
             {currentRecipe.category && (
               <p className="text-white/60 text-xs mb-3">{currentRecipe.category}</p>
             )}
-            <div className="flex flex-wrap justify-center gap-1.5 mb-4">
+            <div className="flex flex-wrap justify-center gap-1.5 mb-3">
               {currentRecipe.ingredients.map((ing, i) => (
-                <button
+                <span
                   key={i}
-                  onClick={() => onAddIngredient(ing.name)}
-                  className="flex items-center gap-1 px-2.5 py-1 bg-white/25 rounded-full text-white text-xs active:scale-90 transition hover:bg-white/40"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/20 rounded-full text-white text-xs"
                 >
-                  <span>{ing.name}{ing.amount ? ` ${ing.amount}` : ''}</span>
-                  <Plus size={10} className="text-white/70" />
-                </button>
+                  {ing.name}{ing.amount ? ` ${ing.amount}` : ''}
+                </span>
               ))}
             </div>
+            <button
+              onClick={() => onAddAllIngredients(currentRecipe.ingredients.map((i) => i.name))}
+              className="w-full mb-3 py-2 rounded-xl text-white text-xs font-medium active:scale-95 transition bg-white/20 hover:bg-white/30"
+            >
+              🛒 一键加入买菜清单
+            </button>
             <div className="flex flex-wrap justify-center gap-2">
               <button
                 onClick={() => onRecordMemory(currentRecipe)}

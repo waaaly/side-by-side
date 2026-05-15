@@ -4,13 +4,16 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, Calendar as CalendarIcon } from 'lucide-react'
 import { CATEGORIES, CATEGORY_GROUPS, getGroup, getCategory } from '@/data/categories'
-import type { ExpenseCategory, Expense, ExpenseFormData } from '@/types'
+import type { ExpenseCategory, Expense, ExpenseFormData, Recipe } from '@/types'
+
+const FOOD_CATEGORIES = new Set(['dining', 'vegetable', 'fruit', 'beverage', 'alcohol', 'snack'])
 
 interface Props {
   isOpen: boolean
   onClose: () => void
   onSave: (data: ExpenseFormData) => void
   editExpense?: Expense | null
+  recipes?: Recipe[]
 }
 
 type Stage = 'category' | 'amount'
@@ -23,13 +26,14 @@ export function todayString(): string {
   return `${yy}-${mm}-${dd}`
 }
 
-export default function AddExpenseModal({ isOpen, onClose, onSave, editExpense }: Props) {
+export default function AddExpenseModal({ isOpen, onClose, onSave, editExpense, recipes }: Props) {
   const isEditing = !!editExpense
   const [stage, setStage] = useState<Stage>(isEditing ? 'amount' : 'category')
   const [selectedCategory, setSelectedCategory] = useState<ExpenseCategory | ''>(editExpense?.category || '')
   const [amount, setAmount] = useState(isEditing ? String(editExpense!.amount) : '')
   const [description, setDescription] = useState(editExpense?.description || '')
   const [date, setDate] = useState(isEditing ? editExpense!.date : todayString())
+  const [recipeId, setRecipeId] = useState(editExpense?.recipeId || '')
 
   const handleSelectCategory = (value: ExpenseCategory) => {
     setSelectedCategory(value)
@@ -45,6 +49,7 @@ export default function AddExpenseModal({ isOpen, onClose, onSave, editExpense }
       category: selectedCategory as ExpenseCategory,
       description,
       date,
+      recipeId: recipeId || undefined,
     })
   }
 
@@ -54,6 +59,7 @@ export default function AddExpenseModal({ isOpen, onClose, onSave, editExpense }
     setAmount('')
     setDescription('')
     setDate(todayString())
+    setRecipeId('')
     onClose()
   }
 
@@ -190,6 +196,25 @@ export default function AddExpenseModal({ isOpen, onClose, onSave, editExpense }
                         className="w-full text-sm text-brand-text outline-none bg-gray-50 rounded-xl px-4 py-2.5"
                       />
                     </div>
+
+                    {selectedCategory && FOOD_CATEGORIES.has(selectedCategory) && recipes && recipes.length > 0 && (
+                      <div className="mb-6">
+                        <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                          <span>🍳</span>
+                          <span>关联菜谱（可选）</span>
+                        </div>
+                        <select
+                          value={recipeId}
+                          onChange={(e) => setRecipeId(e.target.value)}
+                          className="w-full text-sm text-brand-text outline-none bg-gray-50 rounded-xl px-4 py-2.5 appearance-none"
+                        >
+                          <option value="">不关联</option>
+                          {recipes.map((r) => (
+                            <option key={r.id} value={r.id}>{r.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
 
                     <button
                       onClick={handleSubmit}

@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ChevronDown } from 'lucide-react'
+import { ArrowLeft, ChevronDown, ChefHat } from 'lucide-react'
 import Link from 'next/link'
 import { getCategory, getGroup } from '@/data/categories'
 import { useExpenses } from '@/hooks/useExpenses'
+import { useRecipes } from '@/hooks/useRecipes'
 import { getStoredPairId } from '@/lib/pairing'
 import type { Expense } from '@/types'
 
@@ -28,6 +29,7 @@ const periodOptions: { value: PeriodFilter; label: string }[] = [
 export default function StatsPage() {
   const pairId = getStoredPairId()
   const { expenses, myId, partnerId } = useExpenses(pairId)
+  const { recipes } = useRecipes()
 
   const [person, setPerson] = useState<PersonFilter>('all')
   const [period, setPeriod] = useState<PeriodFilter>('month')
@@ -77,6 +79,25 @@ export default function StatsPage() {
   }, [filteredExpenses])
 
   const maxCategoryAmount = Math.max(...categoryBreakdown.map((c) => c.amount), 1)
+
+  const recipeCosts = useMemo(() => {
+    const map = new Map<string, { name: string; total: number; count: number }>()
+    for (const exp of filteredExpenses) {
+      if (!exp.recipeId) continue
+      const recipe = recipes.find((r) => r.id === exp.recipeId)
+      const name = recipe?.name || '未知菜谱'
+      const existing = map.get(exp.recipeId)
+      if (existing) {
+        existing.total += exp.amount
+        existing.count += 1
+      } else {
+        map.set(exp.recipeId, { name, total: exp.amount, count: 1 })
+      }
+    }
+    return Array.from(map.values())
+      .map((r) => ({ ...r, avg: r.total / r.count }))
+      .sort((a, b) => b.avg - a.avg)
+  }, [filteredExpenses, recipes])
 
   return (
     <div className="px-5 pt-3 pb-2">
@@ -198,6 +219,48 @@ export default function StatsPage() {
             })}
           </div>
         </div>
+
+        {recipeCosts.length > 0 && (
+          <div className="bg-white rounded-3xl p-5 mb-4 shadow-sm">
+            <h3 className="text-sm font-semibold text-brand-text mb-4 flex items-center gap-1.5">
+              <ChefHat size={14} className="text-brand-amber" />
+              菜谱成本排行
+            </h3>
+            <div className="space-y-3">
+              {recipeCosts.map((rc, i) => (
+                <motion.div
+                  key={rc.name}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="flex items-center gap-3"
+                >
+                  <span className="text-lg flex-shrink-0">
+                    {i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🍳'}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-brand-text">{rc.name}</p>
+                    <p className="text-[10px] text-gray-400">
+                      共做 {rc.count} 次 · 总花费 ¥{rc.total.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-brand-text tabular">
+                      ¥{rc.avg.toFixed(0)}
+                    </p>
+                    <p className="text-[10px] text-gray-400">平均每次</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            <div className="mt-4 pt-3 border-t border-gray-50">
+              <p className="text-xs text-gray-400 text-center">
+                👨‍🍳 本月最贵的拿手菜：<span className="font-medium text-brand-text">{recipeCosts[0]?.name}</span>，
+                平均每吃一次成本 <span className="font-medium text-brand-text">¥{recipeCosts[0]?.avg.toFixed(0)}</span>
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="bg-white rounded-3xl p-5 shadow-sm mb-20">
           <h3 className="text-sm font-semibold text-brand-text mb-4">支出排行</h3>

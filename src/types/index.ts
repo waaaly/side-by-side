@@ -13,6 +13,7 @@ export interface Expense {
   category: ExpenseCategory
   description: string
   date: string
+  recipeId?: string
   createdBy?: 'me' | 'partner'
 }
 
@@ -103,5 +104,6 @@ export interface ExpenseFormData {
   category: ExpenseCategory
   description: string
   date: string
+  recipeId?: string
   createdBy?: 'me' | 'partner'
 }

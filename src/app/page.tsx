@@ -6,6 +6,7 @@ import { ChevronDown, TrendingUp } from 'lucide-react'
 import AddExpenseModal from '@/components/AddExpenseModal'
 import { getCategory, getGroup } from '@/data/categories'
 import { useExpenses } from '@/hooks/useExpenses'
+import { useRecipes } from '@/hooks/useRecipes'
 import { useBudget } from '@/hooks/useBudget'
 import { getStoredPairId } from '@/lib/pairing'
 import { useNav } from '@/contexts/NavContext'
@@ -54,6 +55,7 @@ function currentMonthStr(): string {
 export default function BudgetPage() {
   const pairId = getStoredPairId()
   const { expenses, addExpense, updateExpense, myId } = useExpenses(pairId)
+  const { recipes } = useRecipes()
   const { total: budgetTotal } = useBudget(pairId)
   const { setOnAddAction } = useNav()
 
@@ -334,6 +336,7 @@ export default function BudgetPage() {
         onClose={handleCloseModal}
         onSave={handleSave}
         editExpense={editExpense}
+        recipes={recipes}
       />
     </div>
   )

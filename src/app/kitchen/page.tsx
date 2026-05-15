@@ -40,7 +40,7 @@ function todayString(): string {
 export default function KitchenPage() {
   const pairId = getStoredPairId()
   const { recipes, addRecipe } = useRecipes()
-  const { items: shoppingItems, addItem, toggleItem, deleteItem } = useShoppingList(pairId)
+  const { items: shoppingItems, addItem, toggleItem, deleteItem, batchAddItems } = useShoppingList(pairId)
   const { memories, addMemory, deleteMemory } = useFoodMemories(pairId)
   const { ratings: allRatings, addRating } = useAllRatings()
   const { challenges, addChallenge, updateChallengeStatus } = useCookingChallenges()
@@ -62,6 +62,10 @@ export default function KitchenPage() {
   const handleAddIngredient = (name: string) => {
     if (shoppingItems.some((i) => i.name === name)) return
     addItem(name)
+  }
+
+  const handleAddAllIngredients = (names: string[]) => {
+    batchAddItems(names)
   }
 
   const handleRecordMemory = (recipe: Recipe) => {
@@ -192,6 +196,7 @@ export default function KitchenPage() {
             <BlindBox
               recipes={recipes}
               onAddIngredient={handleAddIngredient}
+              onAddAllIngredients={handleAddAllIngredients}
               onRecordMemory={handleRecordMemory}
               onCheckIn={handleCheckIn}
               onChallenge={handleChallenge}
