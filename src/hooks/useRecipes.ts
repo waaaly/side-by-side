@@ -2,51 +2,71 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
-import type { Recipe } from '@/types'
+import type { Recipe, RecipeIngredient } from '@/types'
 
-export function useRecipes(pairId: string | null) {
+function toRecipe(row: Record<string, unknown>): Recipe {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    difficulty: (row.difficulty as string) ?? undefined,
+    category: (row.category as string) ?? undefined,
+    tags: (row.tags as string[]) ?? [],
+    ingredients: (row.ingredients ?? []) as RecipeIngredient[],
+    steps: (row.steps ?? []) as string[],
+    createdAt: row.created_at as string,
+  }
+}
+
+export function useRecipes() {
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!pairId) return
     const supabase = createClient()
 
     const load = async () => {
       const { data } = await supabase
         .from('recipes')
         .select('*')
-        .eq('pair_id', pairId)
         .order('created_at', { ascending: false })
-      setRecipes((data ?? []) as unknown as Recipe[])
+      setRecipes((data ?? []).map(toRecipe))
       setLoading(false)
     }
 
     load()
 
     const channel = supabase
-      .channel(`recipes:${pairId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'recipes', filter: `pair_id=eq.${pairId}` }, load)
+      .channel('recipes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'recipes' }, load)
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [pairId])
+  }, [])
 
   const addRecipe = useCallback(async (data: {
-    name: string; emoji: string; ingredients: string[]; tags?: string[]
+    name: string
+    difficulty?: string
+    category?: string
+    tags?: string[]
+    ingredients: RecipeIngredient[]
+    steps: string[]
   }) => {
-    if (!pairId) return null
     const supabase = createClient()
     const { data: created } = await supabase
       .from('recipes')
-      .insert({ pair_id: pairId, ...data })
+      .insert(data)
       .select()
       .single()
-    return created as unknown as Recipe | null
-  }, [pairId])
+    return created ? toRecipe(created as Record<string, unknown>) : null
+  }, [])
 
   const updateRecipe = useCallback(async (id: string, updates: {
-    name?: string; emoji?: string; ingredients?: string[]; tags?: string[]
+    name?: string
+    difficulty?: string | null
+    category?: string | null
+    tags?: string[]
+    ingredients?: RecipeIngredient[]
+    steps?: string[]
   }) => {
     const supabase = createClient()
     await supabase.from('recipes').update(updates).eq('id', id)

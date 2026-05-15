@@ -110,22 +110,27 @@ export async function deleteExpense(id: string): Promise<void> {
 
 /* ─── Recipes ────────────────────────────────── */
 
-export async function fetchRecipes(pairId: string): Promise<Recipe[]> {
+export async function fetchRecipes(): Promise<Recipe[]> {
   const { data } = await supabase()
     .from('recipes')
     .select('*')
-    .eq('pair_id', pairId)
     .order('created_at', { ascending: false })
   return (data ?? []) as unknown as Recipe[]
 }
 
 export async function createRecipe(
-  pairId: string,
-  recipe: { name: string; emoji: string; ingredients: string[]; tags?: string[] },
+  recipe: {
+    name: string
+    difficulty?: string
+    category?: string
+    tags?: string[]
+    ingredients: { name: string; amount?: string }[]
+    steps: string[]
+  },
 ): Promise<Recipe | null> {
   const { data } = await supabase()
     .from('recipes')
-    .insert({ pair_id: pairId, ...recipe })
+    .insert(recipe)
     .select()
     .single()
   return data as unknown as Recipe | null
@@ -133,7 +138,14 @@ export async function createRecipe(
 
 export async function updateRecipe(
   id: string,
-  updates: { name?: string; emoji?: string; ingredients?: string[]; tags?: string[] },
+  updates: {
+    name?: string
+    difficulty?: string | null
+    category?: string | null
+    tags?: string[]
+    ingredients?: { name: string; amount?: string }[]
+    steps?: string[]
+  },
 ): Promise<Recipe | null> {
   const { data } = await supabase()
     .from('recipes')

@@ -22,12 +22,20 @@ export interface Budget {
   month: string
 }
 
+export interface RecipeIngredient {
+  name: string
+  amount?: string
+}
+
 export interface Recipe {
   id: string
   name: string
-  emoji: string
-  ingredients: string[]
+  difficulty?: string
+  category?: string
   tags?: string[]
+  ingredients: RecipeIngredient[]
+  steps: string[]
+  createdAt: string
 }
 
 export interface ShoppingItem {
@@ -64,6 +72,31 @@ export interface Pair {
   created_at: string
   updated_at: string
 }
+
+export interface RecipeRating {
+  id: string
+  recipeId: string
+  createdBy: 'me' | 'partner'
+  rating: number
+  comment?: string
+  date: string
+  createdAt: string
+}
+
+export interface CookingChallenge {
+  id: string
+  recipeId: string
+  fromUser: string
+  toUser: string
+  status: 'pending' | 'accepted' | 'completed'
+  note?: string
+  createdAt: string
+  completedAt?: string
+}
+
+export type FeedItem =
+  | { type: 'rating'; data: RecipeRating; recipe: Recipe }
+  | { type: 'challenge'; data: CookingChallenge; recipe: Recipe }
 
 export interface ExpenseFormData {
   amount: number

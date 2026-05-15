@@ -60,31 +60,30 @@ export interface Database {
       recipes: {
         Row: {
           id: string
-          pair_id: string
           name: string
-          emoji: string
-          ingredients: string[]
+          difficulty: string | null
+          category: string | null
           tags: string[]
-          image_url: string | null
-          created_by: string | null
+          ingredients: { name: string; amount?: string }[]
+          steps: string[]
           created_at: string
         }
         Insert: {
           id?: string
-          pair_id: string
           name: string
-          emoji?: string
-          ingredients?: string[]
+          difficulty?: string | null
+          category?: string | null
           tags?: string[]
-          image_url?: string | null
-          created_by?: string | null
+          ingredients?: { name: string; amount?: string }[]
+          steps?: string[]
         }
         Update: {
           name?: string
-          emoji?: string
-          ingredients?: string[]
+          difficulty?: string | null
+          category?: string | null
           tags?: string[]
-          image_url?: string | null
+          ingredients?: { name: string; amount?: string }[]
+          steps?: string[]
         }
       }
       shopping_list: {
@@ -175,6 +174,54 @@ export interface Database {
           repeat?: boolean
           note?: string | null
           metadata?: Record<string, string> | null
+        }
+      }
+      recipe_ratings: {
+        Row: {
+          id: string
+          recipe_id: string
+          created_by: string
+          rating: number
+          comment: string | null
+          date: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          recipe_id: string
+          created_by?: string
+          rating: number
+          comment?: string | null
+          date?: string
+        }
+        Update: {
+          rating?: number
+          comment?: string | null
+        }
+      }
+      cooking_challenges: {
+        Row: {
+          id: string
+          recipe_id: string
+          from_user: string
+          to_user: string
+          status: string
+          note: string | null
+          created_at: string
+          completed_at: string | null
+        }
+        Insert: {
+          id?: string
+          recipe_id: string
+          from_user: string
+          to_user: string
+          status?: string
+          note?: string | null
+        }
+        Update: {
+          status?: string
+          note?: string | null
+          completed_at?: string | null
         }
       }
       ai_reports: {

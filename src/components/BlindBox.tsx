@@ -2,16 +2,31 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Shuffle, Sparkles, Plus, BookOpen } from 'lucide-react'
+import { Shuffle, Sparkles, Plus, BookOpen, ChefHat, Swords } from 'lucide-react'
 import type { Recipe } from '@/types'
+
+const CATEGORY_EMOJI: Record<string, string> = {
+  '家常菜': '🍳', '川菜': '🌶️', '湘菜': '🌶️', '粤菜': '🥟',
+  '西餐': '🍝', '日料': '🍣', '韩餐': '🥘', '东南亚': '🍜',
+  '甜品': '🍰', '烘焙': '🥐', '汤羹': '🥣', '沙拉': '🥗',
+  '烧烤': '🥩', '早餐': '🥞', '面食': '🍜', '饮品': '🧋',
+}
+
+function recipeEmoji(recipe: { category?: string; name: string }): string {
+  if (recipe.category && CATEGORY_EMOJI[recipe.category]) return CATEGORY_EMOJI[recipe.category]
+  const match = recipe.name.match(/^(\p{Extended_Pictographic})/u)
+  return match?.[1] ?? '🍳'
+}
 
 interface Props {
   recipes: Recipe[]
   onAddIngredient: (name: string) => void
   onRecordMemory: (recipe: Recipe) => void
+  onCheckIn?: (recipe: Recipe) => void
+  onChallenge?: (recipe: Recipe) => void
 }
 
-export default function BlindBox({ recipes, onAddIngredient, onRecordMemory }: Props) {
+export default function BlindBox({ recipes, onAddIngredient, onRecordMemory, onCheckIn, onChallenge }: Props) {
   const [currentRecipe, setCurrentRecipe] = useState<Recipe | null>(null)
   const [isDrawing, setIsDrawing] = useState(false)
 
@@ -70,28 +85,51 @@ export default function BlindBox({ recipes, onAddIngredient, onRecordMemory }: P
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 0.5 }}
             >
-              {currentRecipe.emoji}
+              {recipeEmoji(currentRecipe)}
             </motion.span>
             <p className="text-white text-2xl font-bold mb-2">{currentRecipe.name}</p>
+            {currentRecipe.category && (
+              <p className="text-white/60 text-xs mb-3">{currentRecipe.category}</p>
+            )}
             <div className="flex flex-wrap justify-center gap-1.5 mb-4">
-              {currentRecipe.ingredients.map((ing) => (
+              {currentRecipe.ingredients.map((ing, i) => (
                 <button
-                  key={ing}
-                  onClick={() => onAddIngredient(ing)}
+                  key={i}
+                  onClick={() => onAddIngredient(ing.name)}
                   className="flex items-center gap-1 px-2.5 py-1 bg-white/25 rounded-full text-white text-xs active:scale-90 transition hover:bg-white/40"
                 >
-                  <span>{ing}</span>
+                  <span>{ing.name}{ing.amount ? ` ${ing.amount}` : ''}</span>
                   <Plus size={10} className="text-white/70" />
                 </button>
               ))}
             </div>
-            <button
-              onClick={() => onRecordMemory(currentRecipe)}
-              className="flex items-center gap-1 px-3 py-1.5 bg-white/20 rounded-full text-white text-xs active:scale-90 transition hover:bg-white/30"
-            >
-              <BookOpen size={12} />
-              记录到记忆墙
-            </button>
+            <div className="flex flex-wrap justify-center gap-2">
+              <button
+                onClick={() => onRecordMemory(currentRecipe)}
+                className="flex items-center gap-1 px-3 py-1.5 bg-white/20 rounded-full text-white text-xs active:scale-90 transition hover:bg-white/30"
+              >
+                <BookOpen size={12} />
+                记录到记忆墙
+              </button>
+              {onCheckIn && (
+                <button
+                  onClick={() => onCheckIn(currentRecipe!)}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-white/30 rounded-full text-white text-xs active:scale-90 transition hover:bg-white/40"
+                >
+                  <ChefHat size={12} />
+                  做完啦，打卡！
+                </button>
+              )}
+              {onChallenge && (
+                <button
+                  onClick={() => onChallenge(currentRecipe!)}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-white/20 rounded-full text-white text-xs active:scale-90 transition hover:bg-white/30"
+                >
+                  <Swords size={12} />
+                  挑战对方
+                </button>
+              )}
+            </div>
           </motion.div>
         ) : (
           <motion.div
