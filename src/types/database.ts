@@ -6,6 +6,7 @@ export interface Database {
           id: string
           pair_code: string
           members: string[]
+          metadata: Record<string, unknown> | null
           budget_total: number
           budget_categories: Record<string, number> | null
           created_at: string
@@ -15,12 +16,14 @@ export interface Database {
           id?: string
           pair_code: string
           members?: string[]
+          metadata?: Record<string, unknown> | null
           budget_total?: number
           budget_categories?: Record<string, number> | null
         }
         Update: {
           pair_code?: string
           members?: string[]
+          metadata?: Record<string, unknown> | null
           budget_total?: number
           budget_categories?: Record<string, number> | null
         }

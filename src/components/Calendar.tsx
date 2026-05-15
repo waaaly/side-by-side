@@ -9,6 +9,7 @@ import type { CalendarEvent } from '@/types'
 interface Props {
   currentMonth: Date
   events: CalendarEvent[]
+  selectedDate: string | null
   onDateClick: (dateStr: string) => void
   onPrevMonth: () => void
   onNextMonth: () => void
@@ -53,7 +54,7 @@ const DOT_ICON: Record<string, string> = {
   schedule: '📅',
 }
 
-export default function Calendar({ currentMonth, events, onDateClick, onPrevMonth, onNextMonth }: Props) {
+export default function Calendar({ currentMonth, events, selectedDate, onDateClick, onPrevMonth, onNextMonth }: Props) {
   const year = currentMonth.getFullYear()
   const month = currentMonth.getMonth()
   const firstDay = new Date(year, month, 1).getDay()
@@ -94,6 +95,7 @@ export default function Calendar({ currentMonth, events, onDateClick, onPrevMont
           if (!day) return <div key={i} />
           const ds = `${year}-${pad(month + 1)}-${pad(day)}`
           const isToday = ds === todayStr
+          const isSelected = ds === selectedDate
           const inPeriod = isPeriod(ds)
           const dots = getEventDotTypes(events, ds)
 
@@ -115,16 +117,18 @@ export default function Calendar({ currentMonth, events, onDateClick, onPrevMont
               {/* 日期圆 */}
               <div
                 className={`w-8 h-8 flex items-center justify-center rounded-full text-xs relative ${
-                  isToday
-                    ? 'bg-brand-pink text-white font-semibold'
-                    : inPeriod
-                      ? 'text-brand-pink font-medium'
-                      : isHolidayDay
-                        ? 'text-brand-coral font-medium'
-                        : 'text-brand-text hover:bg-brand-pink/10'
+                  isSelected
+                    ? 'ring-2 ring-brand-pink bg-brand-pink/10 text-brand-pink font-semibold'
+                    : isToday
+                      ? 'bg-brand-pink text-white font-semibold'
+                      : inPeriod
+                        ? 'text-brand-pink font-medium'
+                        : isHolidayDay
+                          ? 'text-brand-coral font-medium'
+                          : 'text-brand-text hover:bg-brand-pink/10'
                 }`}
               >
-                {inPeriod && !isToday && (
+                {inPeriod && !isToday && !isSelected && (
                   <div className="absolute inset-0 bg-gradient-to-b from-brand-pink/15 to-brand-rose/15 rounded-full" />
                 )}
                 <span className="relative z-10">{day}</span>

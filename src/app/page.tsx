@@ -55,7 +55,7 @@ export default function BudgetPage() {
   const pairId = getStoredPairId()
   const { expenses, addExpense, updateExpense, myId } = useExpenses(pairId)
   const { total: budgetTotal } = useBudget(pairId)
-  const { setOnAddExpense } = useNav()
+  const { setOnAddAction } = useNav()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editExpense, setEditExpense] = useState<Expense | null>(null)
@@ -72,9 +72,9 @@ export default function BudgetPage() {
   }
 
   useEffect(() => {
-    setOnAddExpense(handleAddNew)
-    return () => setOnAddExpense(null)
-  }, [setOnAddExpense])
+    setOnAddAction(handleAddNew)
+    return () => setOnAddAction(null)
+  }, [setOnAddAction])
 
   const monthExpenses = useMemo(
     () => expenses.filter((e) => e.date.startsWith(currentMonth)),

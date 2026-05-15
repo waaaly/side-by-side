@@ -9,15 +9,15 @@ import { NavProvider, useNav } from '@/contexts/NavContext'
 import type { ReactNode } from 'react'
 
 function ShellInner({ children }: { children: ReactNode }) {
-  const { onAddExpense } = useNav()
+  const { onAddAction } = useNav()
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-brand-cream safe-area-top">
+    <div className="flex flex-col overflow-hidden bg-brand-cream safe-area-top" style={{ height: 'calc(100vh - env(safe-area-inset-bottom, 0px))' }}>
       <OfflineIndicator />
       <main className="flex-1 overflow-y-auto">
         {children}
       </main>
-      <BottomNav onAddExpense={onAddExpense ?? undefined} />
+      <BottomNav onAddAction={onAddAction ?? undefined} />
     </div>
   )
 }
@@ -28,7 +28,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="h-screen bg-brand-cream flex items-center justify-center">
+      <div className="bg-brand-cream flex items-center justify-center" style={{ height: 'calc(100vh - env(safe-area-inset-bottom, 0px))' }}>
         <div className="w-8 h-8 border-2 border-brand-pink/30 border-t-brand-pink rounded-full animate-spin" />
       </div>
     )
@@ -36,7 +36,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   if (!user && pathname !== '/auth') {
     return (
-      <div className="h-screen bg-brand-cream flex flex-col overflow-hidden safe-area-top">
+      <div className="bg-brand-cream flex flex-col overflow-hidden safe-area-top" style={{ height: 'calc(100vh - env(safe-area-inset-bottom, 0px))' }}>
         <OfflineIndicator />
         <AuthScreen />
       </div>

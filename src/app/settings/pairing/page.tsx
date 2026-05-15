@@ -38,6 +38,8 @@ export default function PairingSettingsPage() {
         setMyEmail(info.myEmail)
         setPartnerEmail(info.partnerEmail)
         setPageState('paired')
+      } else {
+        setPageState('choose')
       }
       setLoading(false)
     }

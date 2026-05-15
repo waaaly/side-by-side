@@ -1,23 +1,36 @@
 'use client'
 
-import { useState, useMemo, Fragment } from 'react'
+import { useState, useMemo, Fragment, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Trash2 } from 'lucide-react'
+import { X, Trash2, ChevronRight } from 'lucide-react'
 import Calendar from '@/components/Calendar'
 import { useCalendarEvents } from '@/hooks/useCalendarEvents'
 import { getStoredPairId } from '@/lib/pairing'
+import { useNav } from '@/contexts/NavContext'
 
-const EVENT_LABEL: Record<string, { icon: string; label: string }> = {
-  period_start: { icon: '🩸', label: '生理期开始' },
-  period_end: { icon: '🩸', label: '生理期结束' },
-  anniversary: { icon: '❤️', label: '纪念日' },
-  birthday: { icon: '🎂', label: '生日' },
-  schedule: { icon: '📅', label: '日程' },
+const EVENT_LABEL: Record<string, { icon: string; label: string; color: string }> = {
+  period_start: { icon: '🩸', label: '生理期开始', color: 'bg-pink-50 text-pink-500' },
+  period_end: { icon: '🩸', label: '生理期结束', color: 'bg-pink-50 text-pink-500' },
+  anniversary: { icon: '❤️', label: '纪念日', color: 'bg-red-50 text-red-400' },
+  birthday: { icon: '🎂', label: '生日', color: 'bg-amber-50 text-amber-500' },
+  schedule: { icon: '📅', label: '日程', color: 'bg-blue-50 text-blue-500' },
 }
 
 function fmtDate(s: string) {
   const d = new Date(s + 'T00:00:00')
   return `${d.getMonth() + 1}月${d.getDate()}日`
+}
+
+function fmtWeekday(s: string) {
+  const days = ['日', '一', '二', '三', '四', '五', '六']
+  return `星期${days[new Date(s + 'T00:00:00').getDay()]}`
+}
+
+function pad(n: number) { return String(n).padStart(2, '0') }
+
+function todayStr() {
+  const d = new Date()
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
 function getActivePeriod(events: { type: string; date: string }[]): string | null {
@@ -34,9 +47,11 @@ function getActivePeriod(events: { type: string; date: string }[]): string | nul
 export default function CalendarPage() {
   const pairId = getStoredPairId()
   const { events, addEvent, updateEvent, deleteEvent } = useCalendarEvents(pairId)
+  const { setOnAddAction } = useNav()
 
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [showPicker, setShowPicker] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [formType, setFormType] = useState<'anniversary' | 'birthday' | 'schedule'>('anniversary')
   const [formTitle, setFormTitle] = useState('')
@@ -46,46 +61,46 @@ export default function CalendarPage() {
 
   const activePeriodStart = useMemo(() => getActivePeriod(events), [events])
 
-  const selectedEvents = useMemo(() => {
-    if (!selectedDate) return []
+  const displayDate = selectedDate ?? todayStr()
+
+  const displayEvents = useMemo(() => {
     return events.filter((e) => {
-      if (e.date === selectedDate) return true
+      if (e.date === displayDate) return true
       if (e.repeat) {
         const [, em, ed] = e.date.split('-')
-        const [, sm, sd] = selectedDate.split('-')
+        const [, sm, sd] = displayDate.split('-')
         if (`${em}-${ed}` === `${sm}-${sd}`) return true
       }
       return false
     })
-  }, [selectedDate, events])
+  }, [displayDate, events])
+
+  useEffect(() => {
+    setOnAddAction(() => setShowPicker(true))
+    return () => setOnAddAction(null)
+  }, [setOnAddAction])
 
   const handlePrevMonth = () => {
-    const m = currentMonth.getMonth()
-    setCurrentMonth(new Date(currentMonth.getFullYear(), m - 1, 1))
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))
   }
+
   const handleNextMonth = () => {
-    const m = currentMonth.getMonth()
-    setCurrentMonth(new Date(currentMonth.getFullYear(), m + 1, 1))
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))
   }
 
   const handleDateClick = (ds: string) => {
-    setSelectedDate(ds)
-    setShowDeleteConfirm(null)
+    setSelectedDate(ds === selectedDate ? null : ds)
   }
 
   const handlePeriodStart = () => {
-    if (!selectedDate) return
-    if (events.some((e) => e.type === 'period_start' && e.date === selectedDate)) return
-    addEvent({ type: 'period_start', title: '姨妈来了', date: selectedDate })
-    setSelectedDate(null)
+    addEvent({ type: 'period_start', title: '姨妈来了', date: displayDate })
+    setShowPicker(false)
   }
 
   const handlePeriodEnd = () => {
-    if (!selectedDate || !activePeriodStart) return
-    if (events.some((e) => e.type === 'period_end' && e.date === selectedDate)) return
-    if (selectedDate < activePeriodStart) return
-    addEvent({ type: 'period_end', title: '姨妈结束', date: selectedDate })
-    setSelectedDate(null)
+    if (!activePeriodStart || displayDate < activePeriodStart) return
+    addEvent({ type: 'period_end', title: '姨妈结束', date: displayDate })
+    setShowPicker(false)
   }
 
   const openForm = (type: 'anniversary' | 'birthday' | 'schedule') => {
@@ -93,20 +108,20 @@ export default function CalendarPage() {
     setFormTitle('')
     setFormNote('')
     setFormRepeat(type !== 'schedule')
+    setShowPicker(false)
     setShowForm(true)
   }
 
   const handleSaveEvent = () => {
-    if (!formTitle.trim() || !selectedDate) return
+    if (!formTitle.trim()) return
     addEvent({
       type: formType,
       title: formTitle.trim(),
-      date: selectedDate,
+      date: displayDate,
       repeat: formRepeat,
       note: formNote.trim() || undefined,
     })
     setShowForm(false)
-    setSelectedDate(null)
   }
 
   const handleDeleteEvent = (id: string, repeat: boolean) => {
@@ -115,7 +130,6 @@ export default function CalendarPage() {
       return
     }
     deleteEvent(id)
-    setSelectedDate(null)
   }
 
   const confirmDeleteAll = () => {
@@ -134,15 +148,15 @@ export default function CalendarPage() {
       })
       .forEach((e) => deleteEvent(e.id))
     setShowDeleteConfirm(null)
-    setSelectedDate(null)
   }
 
   const confirmDeleteOnce = () => {
     if (!showDeleteConfirm) return
     deleteEvent(showDeleteConfirm)
     setShowDeleteConfirm(null)
-    setSelectedDate(null)
   }
+
+  const isToday = displayDate === todayStr()
 
   return (
     <Fragment>
@@ -159,108 +173,139 @@ export default function CalendarPage() {
         <Calendar
           currentMonth={currentMonth}
           events={events}
+          selectedDate={selectedDate}
           onDateClick={handleDateClick}
           onPrevMonth={handlePrevMonth}
           onNextMonth={handleNextMonth}
         />
+
+        <motion.div
+          layout
+          className="mt-3 bg-white rounded-2xl shadow-sm overflow-hidden"
+        >
+          <div
+            onClick={() => setSelectedDate(null)}
+            className={`flex items-center justify-between px-4 py-3 cursor-pointer active:bg-gray-50 transition ${selectedDate ? '' : 'pointer-events-none'}`}
+          >
+            <div className="flex items-center gap-2">
+              {isToday && (
+                <span className="w-5 h-5 rounded-full bg-brand-pink text-white text-[10px] flex items-center justify-center font-semibold">今</span>
+              )}
+              <span className="text-sm font-semibold text-brand-text">{fmtDate(displayDate)}</span>
+              <span className="text-xs text-gray-400">{fmtWeekday(displayDate)}</span>
+            </div>
+            {selectedDate && (
+              <X size={14} className="text-gray-300" />
+            )}
+          </div>
+
+          {displayEvents.length > 0 ? (
+            <div className="px-4 pb-3 space-y-1.5">
+              {displayEvents.map((ev) => {
+                const meta = EVENT_LABEL[ev.type]
+                return (
+                  <motion.div
+                    key={ev.id}
+                    layout
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 ${meta?.color ?? 'bg-gray-50'}`}
+                  >
+                    <span className="text-base">{meta?.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-brand-text truncate">{ev.title}</p>
+                      <div className="flex items-center gap-1.5 text-[10px] text-gray-400">
+                        <span>{meta?.label}</span>
+                        {ev.repeat && <span>· 每年重复</span>}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteEvent(ev.id, !!ev.repeat)}
+                      className="p-1.5 active:scale-90 transition flex-shrink-0"
+                    >
+                      <Trash2 size={13} className="text-gray-300" />
+                    </button>
+                  </motion.div>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="px-4 pb-4">
+              <p className="text-xs text-gray-300 text-center py-3">这一天还没有记录</p>
+            </div>
+          )}
+        </motion.div>
       </div>
 
       <AnimatePresence>
-        {selectedDate && (
+        {showPicker && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/30 z-40"
-              onClick={() => setSelectedDate(null)}
+              onClick={() => setShowPicker(false)}
             />
             <motion.div
               initial={{ opacity: 0, y: '100%' }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: '100%' }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl flex flex-col max-h-[70vh]"
-              style={{ paddingBottom: 'var(--safe-area-bottom)' }}
+              className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl p-6"
+              style={{ paddingBottom: 'calc(1rem + var(--safe-area-bottom, 0px))' }}
             >
-              <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-gray-50 flex-shrink-0">
-                <div />
-                <h2 className="text-base font-semibold text-brand-text">{fmtDate(selectedDate)}</h2>
-                <button onClick={() => setSelectedDate(null)} className="active:scale-95 transition">
-                  <X size={22} className="text-gray-400" />
-                </button>
-              </div>
+              <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
+              <h2 className="text-base font-semibold text-brand-text text-center mb-5">添加事件</h2>
 
-              <div className="flex-1 overflow-y-auto px-6 py-4">
-                {selectedEvents.length > 0 && (
-                  <div className="mb-5 space-y-2">
-                    <p className="text-xs text-gray-400 mb-2">🗓️ 当天事件</p>
-                    {selectedEvents.map((ev) => {
-                      const meta = EVENT_LABEL[ev.type]
-                      return (
-                        <div
-                          key={ev.id}
-                          className="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-3"
-                        >
-                          <span>{meta.icon}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-brand-text">{ev.title}</p>
-                            <div className="flex items-center gap-2 text-[10px] text-gray-400">
-                              <span>{meta.label}</span>
-                              {ev.repeat && <span>· 每年重复</span>}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleDeleteEvent(ev.id, !!ev.repeat)}
-                            className="p-1.5 active:scale-90 transition"
-                          >
-                            <Trash2 size={14} className="text-gray-300" />
-                          </button>
-                        </div>
-                      )
-                    })}
-                  </div>
+              <div className="space-y-2">
+                {!events.some((e) => e.type === 'period_start' && e.date === displayDate) &&
+                  displayDate !== activePeriodStart && (
+                  <button
+                    onClick={handlePeriodStart}
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-pink-50 rounded-2xl active:scale-[0.98] transition"
+                  >
+                    <span className="text-lg">🩸</span>
+                    <span className="text-sm font-medium text-pink-500">生理期开始</span>
+                    <ChevronRight size={16} className="ml-auto text-pink-300" />
+                  </button>
                 )}
-
-                <p className="text-xs text-gray-400 mb-3">📌 添加事件</p>
-                <div className="flex flex-wrap gap-2">
-                  {!events.some((e) => e.type === 'period_start' && e.date === selectedDate) &&
-                    selectedDate !== activePeriodStart && (
-                    <button
-                      onClick={handlePeriodStart}
-                      className="flex items-center gap-1.5 px-3 py-2 bg-pink-50 rounded-xl text-xs text-pink-500 font-medium active:scale-90 transition"
-                    >
-                      <span>🩸</span> 姨妈来了
-                    </button>
-                  )}
-                  {activePeriodStart && selectedDate >= activePeriodStart &&
-                    !events.some((e) => e.type === 'period_end' && e.date === selectedDate) && (
-                    <button
-                      onClick={handlePeriodEnd}
-                      className="flex items-center gap-1.5 px-3 py-2 bg-pink-50 rounded-xl text-xs text-pink-500 font-medium active:scale-90 transition"
-                    >
-                      <span>🩸</span> 姨妈结束
-                    </button>
-                  )}
+                {activePeriodStart && displayDate >= activePeriodStart &&
+                  !events.some((e) => e.type === 'period_end' && e.date === displayDate) && (
                   <button
-                    onClick={() => openForm('anniversary')}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-red-50 rounded-xl text-xs text-red-400 font-medium active:scale-90 transition"
+                    onClick={handlePeriodEnd}
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-pink-50 rounded-2xl active:scale-[0.98] transition"
                   >
-                    <span>❤️</span> 纪念日
+                    <span className="text-lg">🩸</span>
+                    <span className="text-sm font-medium text-pink-500">生理期结束</span>
+                    <ChevronRight size={16} className="ml-auto text-pink-300" />
                   </button>
-                  <button
-                    onClick={() => openForm('birthday')}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-amber-50 rounded-xl text-xs text-amber-500 font-medium active:scale-90 transition"
-                  >
-                    <span>🎂</span> 生日
-                  </button>
-                  <button
-                    onClick={() => openForm('schedule')}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 rounded-xl text-xs text-blue-500 font-medium active:scale-90 transition"
-                  >
-                    <span>📅</span> 日程
-                  </button>
-                </div>
+                )}
+                <button
+                  onClick={() => openForm('anniversary')}
+                  className="w-full flex items-center gap-3 px-4 py-3 bg-red-50 rounded-2xl active:scale-[0.98] transition"
+                >
+                  <span className="text-lg">❤️</span>
+                  <span className="text-sm font-medium text-red-400">纪念日</span>
+                  <ChevronRight size={16} className="ml-auto text-red-300" />
+                </button>
+                <button
+                  onClick={() => openForm('birthday')}
+                  className="w-full flex items-center gap-3 px-4 py-3 bg-amber-50 rounded-2xl active:scale-[0.98] transition"
+                >
+                  <span className="text-lg">🎂</span>
+                  <span className="text-sm font-medium text-amber-500">生日</span>
+                  <ChevronRight size={16} className="ml-auto text-amber-300" />
+                </button>
+                <button
+                  onClick={() => openForm('schedule')}
+                  className="w-full flex items-center gap-3 px-4 py-3 bg-blue-50 rounded-2xl active:scale-[0.98] transition"
+                >
+                  <span className="text-lg">📅</span>
+                  <span className="text-sm font-medium text-blue-500">日程</span>
+                  <ChevronRight size={16} className="ml-auto text-blue-300" />
+                </button>
               </div>
             </motion.div>
           </>
@@ -286,13 +331,13 @@ export default function CalendarPage() {
               style={{ paddingBottom: 'var(--safe-area-bottom)' }}
             >
               <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-gray-50 flex-shrink-0">
-                <div />
+                <button onClick={() => { setShowForm(false); setShowPicker(true) }} className="active:scale-95 transition">
+                  <ChevronRight size={22} className="text-gray-400 rotate-180" />
+                </button>
                 <h2 className="text-base font-semibold text-brand-text">
                   {formType === 'anniversary' ? '添加纪念日' : formType === 'birthday' ? '添加生日' : '添加日程'}
                 </h2>
-                <button onClick={() => setShowForm(false)} className="active:scale-95 transition">
-                  <X size={22} className="text-gray-400" />
-                </button>
+                <div className="w-6" />
               </div>
 
               <div className="px-6 py-4 space-y-4">
@@ -311,6 +356,7 @@ export default function CalendarPage() {
                     }
                     value={formTitle}
                     onChange={(e) => setFormTitle(e.target.value)}
+                    autoFocus
                     className="w-full text-sm text-brand-text outline-none bg-gray-50 rounded-xl px-4 py-2.5 placeholder:text-gray-300"
                   />
                 </div>
@@ -350,7 +396,7 @@ export default function CalendarPage() {
                   disabled={!formTitle.trim()}
                   className="w-full py-3.5 rounded-2xl text-white font-semibold text-base active:scale-95 transition bg-gradient-to-r from-brand-pink to-brand-rose disabled:opacity-40"
                 >
-                  添加
+                  添加到 {fmtDate(displayDate)}
                 </button>
               </div>
             </motion.div>

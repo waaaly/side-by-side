@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import { Receipt, ChefHat, Plus, Calendar, Settings } from 'lucide-react'
 
 interface Props {
-  onAddExpense?: () => void
+  onAddAction?: () => void
 }
 
 const navItems = [
@@ -17,7 +17,7 @@ const navItems = [
   { href: '/settings', label: '设置', icon: Settings },
 ] as const
 
-export default function BottomNav({ onAddExpense }: Props) {
+export default function BottomNav({ onAddAction }: Props) {
   const pathname = usePathname()
 
   return (
@@ -30,7 +30,7 @@ export default function BottomNav({ onAddExpense }: Props) {
           return (
             <button
               key="add"
-              onClick={onAddExpense}
+              onClick={onAddAction}
               className="w-14 h-14 rounded-full bg-gradient-to-r from-brand-pink to-brand-rose text-white shadow-lg shadow-brand-pink/30 flex items-center justify-center -mt-5 active:scale-90 transition"
             >
               <Plus size={28} />

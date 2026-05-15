@@ -3,24 +3,24 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 
 interface NavContextValue {
-  onAddExpense: (() => void) | null
-  setOnAddExpense: (fn: (() => void) | null) => void
+  onAddAction: (() => void) | null
+  setOnAddAction: (fn: (() => void) | null) => void
 }
 
 const NavContext = createContext<NavContextValue>({
-  onAddExpense: null,
-  setOnAddExpense: () => {},
+  onAddAction: null,
+  setOnAddAction: () => {},
 })
 
 export function NavProvider({ children }: { children: ReactNode }) {
-  const [onAddExpense, setOnAddExpense] = useState<(() => void) | null>(null)
+  const [onAddAction, setOnAddAction] = useState<(() => void) | null>(null)
 
   const setHandler = useCallback((fn: (() => void) | null) => {
-    setOnAddExpense(() => fn)
+    setOnAddAction(() => fn)
   }, [])
 
   return (
-    <NavContext.Provider value={{ onAddExpense, setOnAddExpense: setHandler }}>
+    <NavContext.Provider value={{ onAddAction, setOnAddAction: setHandler }}>
       {children}
     </NavContext.Provider>
   )
